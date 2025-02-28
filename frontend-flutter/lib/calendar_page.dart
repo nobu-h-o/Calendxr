@@ -3,7 +3,7 @@ import 'calendar_widget.dart';
 import 'add_event_dialog.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
+  const CalendarPage({super.key});
 
   @override
   _CalendarPageState createState() => _CalendarPageState();
@@ -11,7 +11,7 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   DateTime _currentDate = DateTime.now();
-  List<Event> _events = [];
+  final List<Event> _events = [];
 
   void _addEvent(Event event) {
     setState(() {

@@ -4,7 +4,7 @@ import 'calendar_page.dart';
 class AddEventDialog extends StatefulWidget {
   final Function(Event) onAddEvent;
 
-  const AddEventDialog({Key? key, required this.onAddEvent}) : super(key: key);
+  const AddEventDialog({super.key, required this.onAddEvent});
 
   @override
   _AddEventDialogState createState() => _AddEventDialogState();

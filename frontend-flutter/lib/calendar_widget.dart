@@ -8,11 +8,11 @@ class CalendarWidget extends StatelessWidget {
   final VoidCallback onAddEvent;
 
   const CalendarWidget({
-    Key? key,
+    super.key,
     required this.currentDate,
     required this.events,
     required this.onAddEvent,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
