@@ -22,14 +22,12 @@ export function ChatInterface() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
               <p>Ask me anything about your calendar!</p>
-              <p className="text-sm mt-2">
-                For example:
-                <ul className="mt-2 space-y-1">
-                  <li>"What meetings do I have today?"</li>
-                  <li>"When is my next client call?"</li>
-                  <li>"Schedule a team meeting for tomorrow at 2pm"</li>
-                </ul>
-              </p>
+              <p className="text-sm mt-2">For example:</p>
+              <ul className="mt-2 space-y-1 text-sm">
+                <li>"What meetings do I have today?"</li>
+                <li>"When is my next client call?"</li>
+                <li>"Schedule a team meeting for tomorrow at 2pm"</li>
+              </ul>
             </div>
           ) : (
             <div className="space-y-4">
