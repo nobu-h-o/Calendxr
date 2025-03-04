@@ -25,7 +25,7 @@ export async function GET() {
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
     const res = await calendar.events.list({
       calendarId: "primary",
-      timeMin: new Date('2025-01-01T00:00:00Z').toISOString(), // Fetch events from the year 2024 onwards
+      timeMin: new Date('2025-01-01T00:00:00Z').toISOString(), // Fetch events from the year 2025 onwards
       maxResults: 1000,
       singleEvents: true,
       orderBy: "startTime",
