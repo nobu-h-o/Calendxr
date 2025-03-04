@@ -3,6 +3,7 @@
 import Calendar from "@/app/components/Calendar";
 import { ChatInterface } from "@/app/components/chat-interface";
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function CalendarApp() {
   const { data: session } = useSession();
@@ -11,7 +12,9 @@ export default function CalendarApp() {
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
         <div className="flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold">Calendxr.com</h1>
+          <Link href="/home">
+            <h1 className="text-xl font-bold">Calendxr.com</h1>
+          </Link>
           {!session ? (
             <a>Loading...</a>
           ) : (
