@@ -15,7 +15,7 @@ export function ChatInterface() {
   return (
     <Card className="col-span-1 flex flex-col h-[calc(100vh-120px)]">
       <CardHeader>
-        <CardTitle>Calendar Assistant</CardTitle>
+        <CardTitle>Calendxr AI</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 p-4 overflow-hidden">
         <ScrollArea className="h-full pr-4">
