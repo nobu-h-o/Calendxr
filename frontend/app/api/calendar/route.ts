@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-// Removed authOptions import since it's not exported
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
-// @ts-ignore: Module 'googleapis' might need to be installed with its types.
+ // @ts-ignore: Module 'googleapis' might need to be installed with its types.
 import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 
 export async function GET() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const accessToken = (session as any)?.accessToken; // Cast session as any to access accessToken
 
   if (!session || !session.user || !accessToken) {
@@ -15,7 +16,13 @@ export async function GET() {
   
   try {
     // Use the accessToken from the session for Google Calendar API
-    const calendar = google.calendar({ version: "v3", auth: accessToken });
+    const oAuth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI || "postmessage"
+    );
+    oAuth2Client.setCredentials({ access_token: accessToken });
+    const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
     const res = await calendar.events.list({
       calendarId: "primary",
       timeMin: new Date().toISOString(),
@@ -38,7 +45,8 @@ export async function GET() {
     }));
     
     return NextResponse.json(events);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch calendar events" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Calendar API error:", error);
+    return NextResponse.json({ error: error.message || "Failed to fetch calendar events" }, { status: 500 });
   }
 }
