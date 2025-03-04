@@ -13,17 +13,11 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const fetchedData = await getCalendarEvents();
-        // Assume the Google Calendar API returns an object with an "items" array.
-        const items = fetchedData.items ? fetchedData.items : fetchedData;
-        const transformedEvents = items.map((event: any) => ({
-          title: event.summary,
-          start: event.start.dateTime || event.start.date,
-          end: event.end.dateTime || event.end.date,
-        }));
-        setEvents(transformedEvents);
+        // Assume getCalendarEvents returns the JSON array as shown in your example
+        const fetchedEvents = await getCalendarEvents();
+        setEvents(fetchedEvents);
       } catch (error) {
-        console.error("Error fetching Google Calendar events", error);
+        console.error("Error fetching events", error);
       }
     }
     fetchEvents();
