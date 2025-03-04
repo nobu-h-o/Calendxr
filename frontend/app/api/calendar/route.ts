@@ -38,7 +38,6 @@ export async function GET() {
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
       attendees: ((item.attendees as any[]) || []).map((attendee: any) => ({
         name: attendee.displayName || attendee.email,
-        avatar: "" // Google Calendar API does not provide avatar info
       }))
     }));
     console.log("Fetched Events:", events);

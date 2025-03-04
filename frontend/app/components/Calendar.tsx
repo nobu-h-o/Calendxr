@@ -13,7 +13,6 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        // Assume getCalendarEvents returns the JSON array as shown in your example
         const fetchedEvents = await getCalendarEvents();
         setEvents(fetchedEvents);
       } catch (error) {
