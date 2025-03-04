@@ -7,7 +7,6 @@ import Image from "next/image";
 import rectangle1 from "@/public/sign-in-page/Rectangle 1.svg";
 import rectangle2 from "@/public/sign-in-page/Rectangle 2.svg";
 import rectangle3 from "@/public/sign-in-page/Rectangle 3.svg";
-import screenshot from "@/public/sign-in-page/screenshot.png";
 
 export default function SignInPage() {
   return (
