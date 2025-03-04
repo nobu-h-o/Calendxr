@@ -1,18 +1,41 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import googleLogo from "@/public/google-logo.svg";
+import googleLogo from "@/public/sign-in-page/google-logo.svg";
 import Image from "next/image";
+
+import rectangle1 from "@/public/sign-in-page/Rectangle 1.svg";
+import rectangle2 from "@/public/sign-in-page/Rectangle 2.svg";
+import rectangle3 from "@/public/sign-in-page/Rectangle 3.svg";
+import screenshot from "@/public/sign-in-page/screenshot.png";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <Image
+        src={rectangle1}
+        alt="bg"
+        className="absolute top-0 left-0 w-[200px] md:w-[300px] lg:w-auto"
+      />
+      <Image
+        src={rectangle3}
+        alt="bg"
+        className="absolute bottom-0 right-0 w-[150px] md:w-[250px] lg:w-auto"
+      />
+      <Image
+        src={rectangle2}
+        alt="bg"
+        className="absolute bottom-0 right-32 w-[100px] md:w-[200px] lg:w-auto"
+      />
+      <div className="w-full max-w-xl bg-white rounded-xl p-8">
         {/* Logo Section */}
         <div className=" mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">Calendxr</h2>
-          <p className="text-gray-500 mt-2">
-            Sign in to sync with your Google Calendar
+          <h2 className="text-4xl font-bold text-gray-800">
+            Get Started with Calendxr
+          </h2>
+          <p className="text-gray-500 font-semibold mt-2">
+            Sign in with your Google Account to sync with your existing
+            calendar.
           </p>
         </div>
 
