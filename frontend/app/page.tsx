@@ -19,11 +19,13 @@ export default function CalendarApp() {
             <a>Loading...</a>
           ) : (
             <div className="flex items-center space-x-2">
-              <img
-                src={session!.user!.image ?? "/fallback-profile.png"}
-                alt="Profile Picture"
-                className="w-8 h-8 rounded-full"
-              />
+              <a target="_blank" href="https://myaccount.google.com/?tab=kk">
+                <img
+                  src={session!.user!.image ?? "/fallback-profile.png"}
+                  alt="Profile Picture"
+                  className="w-8 h-8 rounded-full"
+                />
+              </a>
               <button onClick={() => signOut()} className="px-4 py-2 font-medium text-black bg-white rounded border border-black hover:bg-gray-200">Sign Out</button>
             </div>
           )}
