@@ -52,13 +52,19 @@ export default function LandingPage() {
               from images and optimize group meeting schedules based on
               availability.
             </p>
-            <button className="mt-8 px-6 py-2 bg-black text-white rounded-lg font-semibold">
-              {!session ? (
-                <Link href="/auth/signin">Get Started</Link>
-              ) : (
-                <Link href="/">Return to Calendxr</Link>
-              )}
-            </button>
+            {!session ? (
+              <Link href="/auth/signin" className="inline-block">
+                <button className="mt-8 px-6 py-2 bg-black text-white rounded-lg font-semibold w-full">
+                  Get Started
+                </button>
+              </Link>
+            ) : (
+              <Link href="/" className="inline-block">
+                <button className="mt-8 px-6 py-2 bg-black text-white rounded-lg font-semibold w-full">
+                  Return to Calendxr
+                </button>
+              </Link>
+            )}
           </div>
 
           {/* Right side - Images */}
