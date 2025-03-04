@@ -1,7 +1,7 @@
 "use client";
 
-import Calendar from "@/components/Calendar";
-import { ChatInterface } from "@/components/chat-interface";
+import Calendar from "@/app/components/Calendar";
+import { ChatInterface } from "@/app/components/chat-interface";
 import { useSession, signOut } from "next-auth/react";
 
 export default function CalendarApp() {
