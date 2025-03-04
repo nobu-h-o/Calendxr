@@ -18,3 +18,9 @@ cd backend
 poetry update
 poetry run python main.py
 ```
+
+## Docker
+Run docker
+```shell
+docker compose up --build
+```
