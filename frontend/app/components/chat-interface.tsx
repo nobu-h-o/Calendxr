@@ -7,38 +7,100 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/comp
 import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
 import { getMessages, sendChatMessage } from "../../utils/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai"
 
 export function ChatInterface() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [loading, setLoading] = useState(false);  
+  const [loading, setLoading] = useState(false);
   const [conversationID, setConversationID] = useState("");
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Load existing messages when conversation ID changes
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (conversationID) {
+        try {
+          setLoading(true);
+          const response = await getMessages(conversationID);
+          
+          if (response && Array.isArray(response.messages)) {
+            const formattedMessages = response.messages.map((msg: any) => ({
+              id: msg.id || Date.now().toString(),
+              role: msg.role || (msg.is_user ? "user" : "assistant"),
+              content: msg.content || msg.text || "",
+              parts: [{ type: "text", text: msg.content || msg.text || "" }],
+            }));
+            
+            setMessages(formattedMessages);
+          }
+        } catch (error) {
+          console.error("Error loading messages:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadMessages();
+  }, [conversationID]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages]);
 
   const handleSendMessages = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!message.trim()) return;
+    
     setLoading(true);
     console.log("Current conversationID:", conversationID);
-    const response = await sendChatMessage(message, conversationID);
-    setConversationID(response.conversation_id)
+    
+    // Add user message immediately for better UX
     const userMessage: UIMessage = {
       id: Date.now().toString(),
       role: "user",
       content: message,
       parts: [{ type: "text", text: message }],
     };
-  
-    const assistantMessage: UIMessage = {
-      id: (Date.now() + 1).toString(),
-      role: "assistant",
-      content: response.answer || "No response",
-      parts: [{ type: "text", text: response.answer || "No response" }],
-    };
-  
-    setMessages([...messages, userMessage, assistantMessage]);
+    
+    setMessages(prev => [...prev, userMessage]);
+    const currentMessage = message;
     setMessage("");
-    setLoading(false);
+    
+    try {
+      const response = await sendChatMessage(currentMessage, conversationID);
+      setConversationID(response.conversation_id);
+      
+      const assistantMessage: UIMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: response.answer || "No response",
+        parts: [{ type: "text", text: response.answer || "No response" }],
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      // Add error message
+      const errorMessage: UIMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Sorry, there was an error processing your request.",
+        parts: [{ type: "text", text: "Sorry, there was an error processing your request." }],
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +109,7 @@ export function ChatInterface() {
         <CardTitle>Calendxr AI</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 p-4 overflow-hidden">
-        <ScrollArea className="h-full pr-4">
+        <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
               <p>Ask me anything about your calendar!</p>
