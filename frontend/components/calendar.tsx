@@ -1,55 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { addDays, format, startOfWeek, addWeeks, subWeeks } from "date-fns"
 import { CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getCalendarEvents } from "@/lib/calendar"
 
-// Mock data for calendar events
-const EVENTS = [
-  {
-    id: 1,
-    title: "Team Meeting",
-    date: new Date(2025, 1, 28, 10, 0),
-    duration: 60,
-    attendees: [
-      { name: "John Doe", avatar: "/placeholder.svg?height=32&width=32" },
-      { name: "Jane Smith", avatar: "/placeholder.svg?height=32&width=32" },
-    ],
-  },
-  {
-    id: 2,
-    title: "Project Review",
-    date: new Date(2025, 1, 28, 14, 0),
-    duration: 30,
-    attendees: [
-      { name: "John Doe", avatar: "/placeholder.svg?height=32&width=32" },
-      { name: "Alice Johnson", avatar: "/placeholder.svg?height=32&width=32" },
-    ],
-  },
-  {
-    id: 3,
-    title: "Client Call",
-    date: new Date(2025, 1, 29, 11, 0),
-    duration: 45,
-    attendees: [
-      { name: "John Doe", avatar: "/placeholder.svg?height=32&width=32" },
-      { name: "Bob Brown", avatar: "/placeholder.svg?height=32&width=32" },
-    ],
-  },
-]
+interface CalendarEvent {
+  id: number;
+  title: string;
+  date: string;  // ISO formatted date string
+  duration: number;
+  attendees: {
+    name: string;
+    avatar: string;
+  }[];
+}
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const startDate = startOfWeek(currentDate, { weekStartsOn: 1 })
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i))
 
   const nextWeek = () => setCurrentDate(addWeeks(currentDate, 1))
   const prevWeek = () => setCurrentDate(subWeeks(currentDate, 1))
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        setLoading(true)
+        const data = await getCalendarEvents()
+        setEvents(data)
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError("An unknown error occurred")
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchEvents()
+  }, [])
 
   return (
     <Card className="col-span-1">
@@ -87,26 +87,32 @@ export function Calendar() {
             </div>
           ))}
         </div>
-
         <div className="mt-6 space-y-4">
-          {EVENTS.map((event) => (
-            <div key={event.id} className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium">{event.title}</h3>
-                <span className="text-sm text-muted-foreground">{format(event.date, "h:mm a")}</span>
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p>Error: {error}</p>
+          ) : (
+            events.map((event) => (
+              <div key={event.id} className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-medium">{event.title}</h3>
+                  <span className="text-sm text-muted-foreground">
+                    {format(new Date(event.date), "h:mm a")}
+                  </span>
+                </div>
+                <div className="flex -space-x-2">
+                  {event.attendees.map((attendee, i: number) => (
+                    <Avatar key={i} className="border-2 border-background w-8 h-8">
+                      <AvatarImage src={attendee.avatar} alt={attendee.name} />
+                      <AvatarFallback>{attendee.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
               </div>
-              <div className="flex -space-x-2">
-                {event.attendees.map((attendee, i) => (
-                  <Avatar key={i} className="border-2 border-background w-8 h-8">
-                    <AvatarImage src={attendee.avatar} alt={attendee.name} />
-                    <AvatarFallback>{attendee.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-
         <Button className="w-full mt-6" variant="outline">
           <Plus className="h-4 w-4 mr-2" />
           Add Event
@@ -115,4 +121,3 @@ export function Calendar() {
     </Card>
   )
 }
-
