@@ -11,7 +11,7 @@ export default function CalendarApp() {
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
         <div className="flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold">Calendxr</h1>
+          <h1 className="text-xl font-bold">Calendxr.com</h1>
           {!session ? (
             <a>Loading...</a>
           ) : (

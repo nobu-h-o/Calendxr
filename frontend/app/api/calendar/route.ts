@@ -25,8 +25,8 @@ export async function GET() {
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
     const res = await calendar.events.list({
       calendarId: "primary",
-      timeMin: new Date().toISOString(),
-      maxResults: 10,
+      timeMin: new Date('2025-01-01T00:00:00Z').toISOString(), // Fetch events from the year 2024 onwards
+      maxResults: 1000,
       singleEvents: true,
       orderBy: "startTime",
     });
@@ -34,17 +34,16 @@ export async function GET() {
     const events = ((res.data.items as any[]) || []).map((item: any) => ({
       id: item.id,
       title: item.summary || "No Title",
-      date: item.start?.dateTime || item.start?.date || new Date().toISOString(),
-      duration: item.end && item.start
-        ? (new Date(item.end.dateTime || item.end.date).getTime() - new Date(item.start.dateTime || item.start.date).getTime()) / 60000
-        : 0,
+      start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
+      end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
       attendees: ((item.attendees as any[]) || []).map((attendee: any) => ({
         name: attendee.displayName || attendee.email,
         avatar: "" // Google Calendar API does not provide avatar info
       }))
     }));
-    
+    console.log("Fetched Events:", events);
     return NextResponse.json(events);
+
   } catch (error: any) {
     console.error("Calendar API error:", error);
     return NextResponse.json({ error: error.message || "Failed to fetch calendar events" }, { status: 500 });
