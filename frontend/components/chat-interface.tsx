@@ -6,11 +6,40 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { getMessages, sendChatMessage } from "../utils/api";
+import { useState, useEffect } from "react";
+import { UIMessage } from "ai"
 
 export function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
-  })
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<UIMessage[]>([]);
+  const [loading, setLoading] = useState(false);  
+  const [conversationID, setConversationID] = useState("");
+
+  const handleSendMessages = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    console.log("Current conversationID:", conversationID);
+    const response = await sendChatMessage(message, conversationID);
+    setConversationID(response.conversation_id)
+    const userMessage: UIMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: message,
+      parts: [{ type: "text", text: message }],
+    };
+  
+    const assistantMessage: UIMessage = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: response.answer || "No response",
+      parts: [{ type: "text", text: response.answer || "No response" }],
+    };
+  
+    setMessages([...messages, userMessage, assistantMessage]);
+    setMessage("");
+    setLoading(false);
+  };
 
   return (
     <Card className="col-span-1 flex flex-col h-[calc(100vh-120px)]">
@@ -42,7 +71,7 @@ export function ChatInterface() {
                   </div>
                 </div>
               ))}
-              {isLoading && (
+              {loading && (
                 <div className="flex justify-start">
                   <div className="rounded-lg px-3 py-2 bg-muted">
                     <div className="flex space-x-1">
@@ -58,14 +87,14 @@ export function ChatInterface() {
         </ScrollArea>
       </CardContent>
       <CardFooter className="pt-0">
-        <form onSubmit={handleSubmit} className="flex w-full gap-2">
+        <form onSubmit={handleSendMessages} className="flex w-full gap-2">
           <Input
             placeholder="Ask about your calendar..."
-            value={input}
-            onChange={handleInputChange}
-            disabled={isLoading}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            disabled={loading}
           />
-          <Button type="submit" size="icon" disabled={isLoading}>
+          <Button type="submit" size="icon" disabled={loading}>
             <Send className="h-4 w-4" />
             <span className="sr-only">Send</span>
           </Button>
@@ -74,4 +103,3 @@ export function ChatInterface() {
     </Card>
   )
 }
-
