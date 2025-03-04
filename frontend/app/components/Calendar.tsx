@@ -26,8 +26,16 @@ const Calendar: React.FC = () => {
     <FullCalendar
       height="85vh"
       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+      customButtons={{
+        myCustomButton: {
+          text: "Custom!",
+          click: function () {
+            alert("Clicked the custom button!");
+          },
+        },
+      }}
       headerToolbar={{
-        left: "prev,next today",
+        left: "prev,next today myCustomButton",
         center: "title",
         right: "dayGridMonth,timeGridWeek",
       }}
