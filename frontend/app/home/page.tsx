@@ -14,7 +14,9 @@ export default function LandingPage() {
     <div className="min-h-screen no-scrollbar">
       <header className="border-b">
         <div className="flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold">Calendxr.com</h1>
+          <Link href="/home">
+            <h1 className="text-xl font-bold">Calendxr.com</h1>
+          </Link>
           {!session ? (
             <Link href="/auth/signin">
               <button className="px-4 py-2 font-medium text-black bg-white rounded border border-black hover:bg-gray-200">
