@@ -26,6 +26,10 @@ const Calendar: React.FC = () => {
     <FullCalendar
       height="85vh"
       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+      editable={true}
+      selectable={true} // Allow dates to be selectable.
+      selectMirror={true} // Mirror selections visually.
+      dayMaxEvents={true}
       customButtons={{
         myCustomButton: {
           text: "Custom!",
