@@ -16,6 +16,7 @@ const Calendar: React.FC = () => {
   const [isNewEvent, setIsNewEvent] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Function to fetch events from Google Calendar
   const fetchEvents = async () => {
@@ -155,6 +156,7 @@ const Calendar: React.FC = () => {
       await fetchEvents(); // Refresh events
     } catch (error) {
       console.error("Error updating event:", error);
+      setError("Failed to update event. Please check on Google Calendar.");
       changeInfo.revert?.();
     } finally {
       setIsSyncing(false);
@@ -295,13 +297,6 @@ const Calendar: React.FC = () => {
               <h2 className="text-xl font-semibold">
                 {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
               </h2>
-              <button 
-                onClick={handleFormClose}
-                className="rounded-full p-2 hover:bg-muted text-muted-foreground"
-                disabled={isSyncing}
-              >
-                ✕
-              </button>
             </div>
             <EventForm 
               event={selectedEvent} 
@@ -312,7 +307,29 @@ const Calendar: React.FC = () => {
             />
           </div>
         )}
+      {error && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="ml-4 text-white font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       </div>
+    {error && (
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
+        <span>{error}</span>
+        <button
+          onClick={() => setError(null)}
+          className="ml-4 text-white font-bold"
+        >
+          ✕
+        </button>
+      </div>
+    )}
     </div>
   );
 };
