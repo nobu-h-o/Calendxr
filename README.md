@@ -17,13 +17,18 @@ Calendxr provides an AI-powered smart calendar experience with the following key
 
 ## 🛠 Built With
 
+### Tech stack
 - [Next.js](https://nextjs.org/) - The React Framework
 - [Fast API](https://fastapi.tiangolo.com/) - Backend API
 - [Docker](https://www.docker.com/) - Containerization
 - [Vercel](https://vercel.com/) - Frontend Server
 - [AWS](https://aws.amazon.com/) - Backend Server
-- [Google Calendar API](https://developers.google.com/calendar) - API Integration
+
+### APIs Used
+- [Google Calendar API](https://developers.google.com/calendar) - Google Calendar Integration
+- [Google Cloud Vision API](https://cloud.google.com/vision) - Image analysis Integration
 - [ChatGPT API](https://openai.com/) - AI Integration
+- [Dify AI API](https://dify.ai/jp) - AI Chat bot Integration
 
 ## 👨‍💻 Authors
 
