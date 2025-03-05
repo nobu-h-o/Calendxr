@@ -6,7 +6,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 
-export async function POST(request: Request) {
+export async function DELETE(request: Request) {
   try {
     // 1. Check authentication
     const session = await getServerSession(authOptions);
@@ -32,8 +32,8 @@ export async function POST(request: Request) {
     }
     
     // 4. Validate request parameters
-    const { calendarId, eventData } = body;
-    if (!calendarId || !eventData) {
+    const { calendarId, eventId } = body;
+    if (!calendarId || !eventId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
     
@@ -45,16 +45,16 @@ export async function POST(request: Request) {
     
     oAuth2Client.setCredentials({ access_token: accessToken });
     
-    // 6. Call Google Calendar API to create the event
+    // 6. Call Google Calendar API to delete the event
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
     
     try {
-      const res = await calendar.events.insert({
+      await calendar.events.delete({
         calendarId,
-        requestBody: eventData,
+        eventId,
       });
       
-      return NextResponse.json(res.data);
+      return NextResponse.json({ message: "Event deleted successfully" });
     } catch (error) {
       console.error("Google Calendar API error:", error);
       return NextResponse.json(

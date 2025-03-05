@@ -1,471 +1,558 @@
 "use client";
 
-import { useState } from "react";
-import { format } from "date-fns";
-import {
-  CalendarIcon,
-  MapPin,
-  Video,
-  Bell,
-  User,
-  ChevronDown,
-  X,
-  Bold,
-  Italic,
-  Underline,
-  List,
-  ListOrdered,
-  Link2,
-  Trash2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { format, isAfter, isSameDay, addHours } from "date-fns";
 import { Button } from "@/app/components/ui/button";
-import { Calendar } from "@/app/components/ui/calendar";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/app/components/ui/form";
 import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
+import { Textarea } from "@/app/components/ui/textarea";
+import { Checkbox } from "@/app/components/ui/checkbox";
+import { CalendarIcon, Trash2 } from "lucide-react";
+import { Calendar } from "@/app/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/app/components/ui/popover";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/app/components/ui/tabs";
-import { Textarea } from "@/app/components/ui/textarea";
-import { Checkbox } from "@/app/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/app/components/ui/tooltip";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/app/components/ui/alert-dialog";
 
-export default function EventForm() {
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(
-    new Date(new Date().setHours(new Date().getHours() + 1))
-  );
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [title, setTitle] = useState("");
-
-  const handleSave = () => {
-    // Here you would typically save the event data
-    console.log({
-      title,
-      startDate,
-      endDate,
-      isAllDay,
-      // Add other form fields as needed
-    });
-    alert("Event saved!");
-  };
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Header with close button and save */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button className="text-gray-500 hover:text-gray-700">
-          <X className="h-5 w-5" />
-        </button>
-        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-          Save
-        </Button>
-      </div>
-
-      {/* Form content */}
-      <div className="p-4 flex-1 overflow-auto">
-        {/* Title input */}
-        <div className="mb-6">
-          <Input
-            type="text"
-            placeholder="Add title"
-            className="text-xl border-0 border-b-2 rounded-none px-0 pb-2 focus-visible:ring-0 focus-visible:border-blue-600"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-
-        {/* Date and time selectors */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <DatePickerWithPresets date={startDate} setDate={setStartDate} />
-
-          {!isAllDay && (
-            <>
-              <TimePickerSelect
-                value={format(startDate, "HH:mm")}
-                onChange={(time) => {
-                  const [hours, minutes] = time.split(":").map(Number);
-                  const newDate = new Date(startDate);
-                  newDate.setHours(hours, minutes);
-                  setStartDate(newDate);
-                }}
-              />
-
-              <span className="self-center text-gray-500">to</span>
-            </>
-          )}
-
-          <DatePickerWithPresets date={endDate} setDate={setEndDate} />
-
-          {!isAllDay && (
-            <TimePickerSelect
-              value={format(endDate, "HH:mm")}
-              onChange={(time) => {
-                const [hours, minutes] = time.split(":").map(Number);
-                const newDate = new Date(endDate);
-                newDate.setHours(hours, minutes);
-                setEndDate(newDate);
-              }}
-            />
-          )}
-
-          <Button variant="outline" size="sm" className="ml-2">
-            Time zone
-          </Button>
-        </div>
-
-        {/* All day and repeat */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="all-day"
-              checked={isAllDay}
-              onCheckedChange={(checked) => setIsAllDay(checked === true)}
-            />
-            <Label htmlFor="all-day" className="text-sm">
-              All day
-            </Label>
-          </div>
-
-          <Select defaultValue="does-not-repeat">
-            <SelectTrigger className="w-[180px] h-8">
-              <SelectValue placeholder="Does not repeat" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="does-not-repeat">Does not repeat</SelectItem>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-              <SelectItem value="yearly">Yearly</SelectItem>
-              <SelectItem value="custom">Custom...</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="details" className="mb-6">
-          <TabsList className="border-b rounded-none bg-transparent h-auto p-0 w-full justify-start">
-            <TabsTrigger
-              value="details"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-4 py-2"
-            >
-              Event details
-            </TabsTrigger>
-            <TabsTrigger
-              value="find-time"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-4 py-2"
-            >
-              Find a time
-            </TabsTrigger>
-            <TabsTrigger
-              value="guests"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-4 py-2"
-            >
-              Guests
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details" className="pt-4">
-            {/* Google Meet */}
-            <div className="flex items-center gap-2 p-2 mb-4 hover:bg-gray-100 rounded">
-              <Video className="text-gray-500 h-5 w-5" />
-              <span className="text-gray-500 text-sm">
-                Add Google Meet video conferencing
-              </span>
-            </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-2 p-2 mb-4 hover:bg-gray-100 rounded">
-              <MapPin className="text-gray-500 h-5 w-5" />
-              <Input
-                placeholder="Add location"
-                className="border-0 focus-visible:ring-0 p-0 text-sm"
-              />
-            </div>
-
-            {/* Notification */}
-            <div className="flex items-center gap-2 p-2 mb-4">
-              <Bell className="text-gray-500 h-5 w-5" />
-              <div className="flex items-center gap-2">
-                <Select defaultValue="30">
-                  <SelectTrigger className="w-[80px] h-8">
-                    <SelectValue placeholder="30" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="15">15</SelectItem>
-                    <SelectItem value="30">30</SelectItem>
-                    <SelectItem value="60">60</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select defaultValue="minutes">
-                  <SelectTrigger className="w-[120px] h-8">
-                    <SelectValue placeholder="minutes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="minutes">minutes</SelectItem>
-                    <SelectItem value="hours">hours</SelectItem>
-                    <SelectItem value="days">days</SelectItem>
-                    <SelectItem value="weeks">weeks</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <Button
-              variant="ghost"
-              className="text-blue-600 hover:bg-blue-50 hover:text-blue-700 pl-2 mb-4"
-            >
-              <span>Add notification</span>
-            </Button>
-
-            {/* User */}
-            <div className="flex items-center gap-2 p-2 mb-4">
-              <User className="text-gray-500 h-5 w-5" />
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs">
-                    N
-                  </div>
-                  <span className="text-sm">Nobuhiro Oto</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </div>
-            </div>
-
-            {/* Busy */}
-            <div className="flex items-center gap-2 p-2 mb-4">
-              <div className="w-5 h-5" />{" "}
-              {/* Spacer to align with icons above */}
-              <div className="flex items-center gap-2">
-                <Select defaultValue="busy">
-                  <SelectTrigger className="w-[120px] h-8">
-                    <SelectValue placeholder="Busy" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="busy">Busy</SelectItem>
-                    <SelectItem value="free">Free</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select defaultValue="default">
-                  <SelectTrigger className="w-[180px] h-8">
-                    <SelectValue placeholder="Default visibility" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">Default visibility</SelectItem>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="text-gray-500">?</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Visibility settings</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="border rounded-md mt-4">
-              <div className="flex items-center gap-1 p-2 border-b">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <Bold className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <Italic className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <Underline className="h-4 w-4" />
-                </Button>
-                <div className="h-5 w-px bg-gray-300 mx-1" />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <ListOrdered className="h-4 w-4" />
-                </Button>
-                <div className="h-5 w-px bg-gray-300 mx-1" />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <Link2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              <Textarea
-                placeholder="Add description"
-                className="border-0 rounded-none focus-visible:ring-0 min-h-[150px]"
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="find-time" className="pt-4">
-            <div className="text-center py-8 text-gray-500">
-              Schedule finder functionality would go here
-            </div>
-          </TabsContent>
-
-          <TabsContent value="guests" className="pt-4">
-            <div className="mb-6">
-              <Input placeholder="Add guests" className="bg-gray-100 mb-4" />
-
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium mb-2">Guest permissions</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="modify-event" />
-                    <Label htmlFor="modify-event" className="text-sm">
-                      Modify event
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="invite-others" defaultChecked />
-                    <Label htmlFor="invite-others" className="text-sm">
-                      Invite others
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="see-guest-list" defaultChecked />
-                    <Label htmlFor="see-guest-list" className="text-sm">
-                      See guest list
-                    </Label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
-
-interface DatePickerWithPresetsProps {
-  date: Date;
-  setDate: (date: Date) => void;
-}
-
-function DatePickerWithPresets({ date, setDate }: DatePickerWithPresetsProps) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-[150px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "MMM d, yyyy") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(date) => date && setDate(date)}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-interface TimePickerSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-function TimePickerSelect({ value, onChange }: TimePickerSelectProps) {
-  // Generate time options in 30-minute intervals
-  const timeOptions = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (const minute of [0, 30]) {
-      const formattedHour = hour.toString().padStart(2, "0");
-      const formattedMinute = minute.toString().padStart(2, "0");
-      timeOptions.push(`${formattedHour}:${formattedMinute}`);
-    }
+// Create a schema with dynamic validation for end time
+const formSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().optional(),
+  location: z.string().optional(),
+  allDay: z.boolean().default(false),
+  startDate: z.date(),
+  startTime: z.string().optional(),
+  endDate: z.date(),
+  endTime: z.string().optional(),
+}).refine((data) => {
+  // Skip validation for all-day events, just ensure end date is not before start date
+  if (data.allDay) {
+    return isAfter(data.endDate, data.startDate) || isSameDay(data.endDate, data.startDate);
   }
+  
+  // For timed events, check if end is after start
+  const [startHours, startMinutes] = (data.startTime || "00:00").split(":").map(Number);
+  const [endHours, endMinutes] = (data.endTime || "00:00").split(":").map(Number);
+  
+  const startDateTime = new Date(data.startDate);
+  startDateTime.setHours(startHours, startMinutes, 0, 0);
+  
+  const endDateTime = new Date(data.endDate);
+  endDateTime.setHours(endHours, endMinutes, 0, 0);
+  
+  return isAfter(endDateTime, startDateTime);
+}, {
+  message: "End time must be after start time",
+  path: ["endTime"] // Show error on the end time field
+});
 
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-[80px]">
-        <SelectValue placeholder={value} />
-      </SelectTrigger>
-      <SelectContent>
-        {timeOptions.map((time) => (
-          <SelectItem key={time} value={time}>
-            {format(new Date(`2000-01-01T${time}`), "HH:mm")}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+interface EventFormProps {
+  event?: any;
+  onClose?: () => void;
+  onFormSubmit?: (values: any) => void;
+  onDelete?: (calendarId: string, eventId: string) => void; // Add delete handler prop
+  disabled?: boolean;
 }
+
+const EventForm: React.FC<EventFormProps> = ({ 
+  event, 
+  onClose, 
+  onFormSubmit,
+  onDelete,
+  disabled = false
+}) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Initialize form with default values or event data
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      location: "",
+      allDay: false,
+      startDate: new Date(),
+      startTime: "09:00",
+      endDate: new Date(),
+      endTime: "10:00",
+    },
+    mode: "onChange" // Validate on change to provide immediate feedback
+  });
+  
+  // Update form when event is provided (edit mode)
+  useEffect(() => {
+    if (event) {
+      const startDate = event.start || new Date();
+      const endDate = event.end || new Date(startDate);
+      
+      // Format times for the form
+      const startTime = event.allDay 
+        ? "00:00" 
+        : format(startDate, "HH:mm");
+        
+      const endTime = event.allDay 
+        ? "23:59" 
+        : format(endDate, "HH:mm");
+        
+      form.reset({
+        title: event.title || "",
+        description: event.description || "",
+        location: event.location || "",
+        allDay: event.allDay || false,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
+      });
+    }
+  }, [event, form]);
+  
+  // Auto-adjust end time when start time or date changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      // Skip if we're not fully initialized yet
+      if (!value.startDate || !value.endDate) return;
+      
+      // If all-day, just make sure end date is not before start date
+      if (value.allDay) {
+        if (isAfter(value.startDate, value.endDate)) {
+          form.setValue('endDate', value.startDate);
+        }
+        return;
+      }
+      
+      // Handle changes to start time or date
+      if (name === 'startTime' || name === 'startDate') {
+        const [startHours, startMinutes] = (value.startTime || "00:00").split(":").map(Number);
+        const [endHours, endMinutes] = (value.endTime || "00:00").split(":").map(Number);
+        
+        const startDateTime = new Date(value.startDate);
+        startDateTime.setHours(startHours, startMinutes, 0, 0);
+        
+        const endDateTime = new Date(value.endDate);
+        endDateTime.setHours(endHours, endMinutes, 0, 0);
+        
+        // If end time is no longer after start time, adjust it
+        if (!isAfter(endDateTime, startDateTime)) {
+          // If same day, set end time 1 hour after start time
+          if (isSameDay(value.startDate, value.endDate)) {
+            const newEndTime = new Date(startDateTime);
+            newEndTime.setHours(newEndTime.getHours() + 1);
+            form.setValue('endTime', format(newEndTime, 'HH:mm'));
+          } else {
+            // If different days, just set the end date to match start date
+            // and end time 1 hour after start time
+            form.setValue('endDate', value.startDate);
+            const newEndTime = new Date(startDateTime);
+            newEndTime.setHours(newEndTime.getHours() + 1);
+            form.setValue('endTime', format(newEndTime, 'HH:mm'));
+          }
+        }
+      }
+      
+      // When end date changes, make sure it's valid with current times
+      if (name === 'endDate' && isSameDay(value.startDate, value.endDate)) {
+        const [startHours, startMinutes] = (value.startTime || "00:00").split(":").map(Number);
+        const [endHours, endMinutes] = (value.endTime || "00:00").split(":").map(Number);
+        
+        // If end time is before start time on the same day, adjust it
+        if (
+          startHours > endHours || 
+          (startHours === endHours && startMinutes >= endMinutes)
+        ) {
+          const newStartDateTime = new Date(value.startDate);
+          newStartDateTime.setHours(startHours, startMinutes, 0, 0);
+          
+          const newEndTime = addHours(newStartDateTime, 1);
+          form.setValue('endTime', format(newEndTime, 'HH:mm'));
+        }
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
+  
+  const handleSubmitForm = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    
+    try {
+      console.log("Form values:", values);
+      
+      // Prepare dates based on all-day setting
+      let startDateTime, endDateTime;
+      
+      if (values.allDay) {
+        // All-day events use date only
+        startDateTime = values.startDate;
+        
+        // For all-day events, end date should be the next day for Google Calendar
+        endDateTime = new Date(values.endDate);
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      } else {
+        // Timed events combine date and time
+        const [startHours, startMinutes] = values.startTime?.split(":") || ["0", "0"];
+        const [endHours, endMinutes] = values.endTime?.split(":") || ["0", "0"];
+        
+        startDateTime = new Date(values.startDate);
+        startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0);
+        
+        endDateTime = new Date(values.endDate);
+        endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0);
+      }
+      
+      // Format event data for Google Calendar API
+      const eventData: any = {
+        summary: values.title,
+        description: values.description,
+        location: values.location,
+      };
+      
+      // Add date information in the correct format
+      if (values.allDay) {
+        eventData.start = { 
+          date: format(startDateTime, "yyyy-MM-dd") 
+        };
+        eventData.end = { 
+          date: format(endDateTime, "yyyy-MM-dd") 
+        };
+      } else {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        eventData.start = { 
+          dateTime: startDateTime.toISOString(),
+          timeZone
+        };
+        eventData.end = { 
+          dateTime: endDateTime.toISOString(),
+          timeZone
+        };
+      }
+      
+      // Send the formatted data to the parent component
+      if (onFormSubmit) {
+        onFormSubmit(eventData);
+      }
+      
+    } catch (error) {
+      console.error("Error preparing event data:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleDelete = async () => {
+    if (!event?.id) return;
+    
+    setIsDeleting(true);
+    try {
+      const calendarId = event.calendarId || 'primary';
+      
+      // Use the onDelete callback provided by the parent component
+      if (onDelete) {
+        onDelete(calendarId, event.id);
+      }
+      
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+  
+  // Watch for all-day status to apply consistent spacing
+  const isAllDay = form.watch("allDay");
+  
+  return (
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmitForm)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={disabled} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} disabled={disabled} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={disabled} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="allDay"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox 
+                    checked={field.value} 
+                    onCheckedChange={field.onChange}
+                    disabled={disabled}
+                  />
+                </FormControl>
+                <FormLabel className="font-normal">All Day Event</FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Date and Time Row - START */}
+          <div className="space-y-2">
+            <div className="text-sm font-medium">Start</div>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Start Date */}
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button 
+                            variant="outline" 
+                            className="w-full pl-3 text-left font-normal h-10"
+                            disabled={disabled}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                          disabled={disabled}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Start Time or Spacer */}
+              <div>
+                {!isAllDay ? (
+                  <FormField
+                    control={form.control}
+                    name="startTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input 
+                            type="time" 
+                            {...field} 
+                            className="h-10"
+                            disabled={disabled}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  // Empty div to maintain layout when time is hidden
+                  <div className="h-10"></div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Date and Time Row - END */}
+          <div className="space-y-2">
+            <div className="text-sm font-medium">End</div>
+            <div className="grid grid-cols-2 gap-4">
+              {/* End Date */}
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button 
+                            variant="outline" 
+                            className="w-full pl-3 text-left font-normal h-10"
+                            disabled={disabled}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                          disabled={(date) => 
+                            isAfter(new Date(form.getValues().startDate), date) || disabled
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* End Time or Spacer */}
+              <div>
+                {!isAllDay ? (
+                  <FormField
+                    control={form.control}
+                    name="endTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input 
+                            type="time" 
+                            {...field} 
+                            className="h-10"
+                            disabled={disabled}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  // Empty div to maintain layout when time is hidden
+                  <div className="h-10"></div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-between pt-6">
+            {/* Delete button (only shown when editing) */}
+            {event?.id && (
+              <Button 
+                type="button" 
+                variant="destructive"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSubmitting || isDeleting || disabled}
+                className="flex items-center"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            )}
+            
+            {/* Empty div for spacing when there's no delete button */}
+            {!event?.id && <div></div>}
+            
+            {/* Save/Cancel buttons */}
+            <div className="flex space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onClose}
+                disabled={isSubmitting || isDeleting || disabled}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={isSubmitting || isDeleting || disabled}
+              >
+                {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Form>
+      
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Event</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this event? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
+
+export default EventForm;
