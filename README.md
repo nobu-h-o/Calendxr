@@ -27,11 +27,11 @@ Calendxr provides an AI-powered smart calendar experience with the following key
 
 ## 👨‍💻 Authors
 
-- **Miu Nicole Takagi** - *presenter* - [GitHub](https://github.com/your-github)
-- **Nobuhiro Oto** - *developer* - [GitHub](https://github.com/your-github)
-- **Ryota Tetsuka** - *developer* - [GitHub](https://github.com/your-github)
-- **Jihun Park** - *developer* - [GitHub](https://github.com/your-github)
-- **Atomu Naka** - *developer* - [GitHub](https://github.com/your-github)
+- **Miu Nicole Takagi** - *presenter* - [GitHub](https://github.com/mint-talltree)
+- **Nobuhiro Oto** - *developer* - [GitHub](https://github.com/nobu-h-o)
+- **Ryota Tetsuka** - *developer* - [GitHub](https://github.com/rogue1starwars)
+- **Jihun Park** - *developer* - [GitHub](https://github.com/JihunPark03)
+- **Atomu Naka** - *developer* - [GitHub](https://github.com/Cardioid22)
 - **Misaki Hara** - *developer* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 Acknowledgments
