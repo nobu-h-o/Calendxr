@@ -313,13 +313,6 @@ const Calendar: React.FC = () => {
           </div>
         )}
       </div>
-      
-      {/* Syncing indicator */}
-      {isSyncing && (
-        <div className="fixed bottom-4 left-4 bg-primary text-primary-foreground py-2 px-4 rounded-md shadow-md z-50">
-          Saving to Google Calendar...
-        </div>
-      )}
     </div>
   );
 };
