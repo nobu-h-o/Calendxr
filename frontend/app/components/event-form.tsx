@@ -58,38 +58,45 @@ export default function EventForm() {
   const [isAllDay, setIsAllDay] = useState(false);
   const [title, setTitle] = useState("");
 
-  const handleSave = () => {
-    // Here you would typically save the event data
-    console.log({
-      title,
-      startDate,
-      endDate,
-      isAllDay,
-      // Add other form fields as needed
-    });
-    alert("Event saved!");
+  const handleSave = async () => {
+    const eventData = {
+      summary: title,
+      start: isAllDay
+        ? { date: startDate.toISOString().split("T")[0] }
+        : { dateTime: startDate.toISOString() },
+      end: isAllDay
+        ? { date: endDate.toISOString().split("T")[0] }
+        : { dateTime: endDate.toISOString() }
+    };
+    try {
+      const res = await fetch("/api/calendar/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ calendarId: "primary", eventData })
+      });
+      const result = await res.json();
+      if (res.ok) {
+        alert("Event created successfully!");
+      } else {
+        alert("Failed to create event: " + result.error);
+      }
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header with close button and save */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button className="text-gray-500 hover:text-gray-700">
-          <X className="h-5 w-5" />
-        </button>
-        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-          Save
-        </Button>
+    <div className="flex flex-col h-full bg-white rounded-lg shadow">
+      <div className="p-4 border-b border-gray-200">
+        <h2 className="text-xl font-semibold">Event Details</h2>
       </div>
-
-      {/* Form content */}
       <div className="p-4 flex-1 overflow-auto">
         {/* Title input */}
         <div className="mb-6">
           <Input
             type="text"
             placeholder="Add title"
-            className="text-xl border-0 border-b-2 rounded-none px-0 pb-2 focus-visible:ring-0 focus-visible:border-blue-600"
+            className="text-xl border-0 rounded-none px-0 pb-2 focus:outline-none focus-visible:ring-0"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -401,6 +408,12 @@ export default function EventForm() {
             </div>
           </TabsContent>
         </Tabs>
+      </div>
+      {/* Save Button */}
+      <div className="flex justify-end p-4 border-t border-gray-200">
+        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white">
+          Save
+        </Button>
       </div>
     </div>
   );

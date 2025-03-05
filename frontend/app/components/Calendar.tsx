@@ -14,10 +14,6 @@ import {
   DialogTitle,
 } from "@/app/components/ui/dialog";
 
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-icons/font/bootstrap-icons.css"; // needs additional webpack config!
-import bootstrap5Plugin from "@fullcalendar/bootstrap5";
-
 const Calendar: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -42,7 +38,6 @@ const Calendar: React.FC = () => {
           dayGridPlugin,
           timeGridPlugin,
           interactionPlugin,
-          bootstrap5Plugin,
         ]}
         editable={true}
         selectable={true} // Allow dates to be selectable.
@@ -57,18 +52,16 @@ const Calendar: React.FC = () => {
           },
         }}
         headerToolbar={{
-          left: "prev,next today myCustomButton",
+          left: "prev,next myCustomButton",
           center: "title",
           right: "dayGridMonth,timeGridWeek",
         }}
         initialView="dayGridMonth"
         events={events}
-        themeSystem="bootstrap5"
       />
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="w-[500px] max-w-lg max-h-[90vh] overflow-y-auto p-6">
           <DialogHeader>
-            <DialogTitle>イベントを追加</DialogTitle>
           </DialogHeader>
           <EventForm />
         </DialogContent>

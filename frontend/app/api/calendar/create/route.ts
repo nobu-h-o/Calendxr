@@ -11,6 +11,9 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!session.accessToken || !session.refreshToken) {
+    return NextResponse.json({ error: "Missing access or refresh token in session. Please sign in again." }, { status: 400 });
+  }
   
   let body;
   try {
@@ -29,8 +32,21 @@ export async function POST(request: Request) {
     process.env.GOOGLE_CLIENT_SECRET
   );
   
-  oAuth2Client.setCredentials({ access_token: (session.user as any)?.accessToken });
-  
+  // Log session data for debugging purposes
+  console.log("Session data:", session);
+  const credentials: { access_token: string, refresh_token?: string } = {
+    access_token: session.accessToken,
+  };
+  if (session.refreshToken) {
+    credentials.refresh_token = session.refreshToken;
+  }
+  oAuth2Client.setCredentials(credentials);
+  oAuth2Client.on("tokens", (tokens) => {
+    if (tokens.refresh_token) {
+      console.log("New refresh token:", tokens.refresh_token);
+    }
+    console.log("New access token:", tokens.access_token);
+  });
   const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
   
   try {
@@ -40,8 +56,12 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(res.data);
   } catch (error) {
+    let errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("Missing access or refresh token")) {
+      errorMessage = "Authentication error: Missing access or refresh token. Please sign out and sign in again.";
+    }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: errorMessage },
       { status: 500 }
     );
   }

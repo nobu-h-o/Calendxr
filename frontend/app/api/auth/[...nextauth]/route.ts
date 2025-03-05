@@ -5,6 +5,7 @@ import type { Session } from "next-auth";
 declare module "next-auth" {
   interface Session {
     accessToken?: string;
+    refreshToken?: string;
   }
 }
 
@@ -34,11 +35,13 @@ export const authOptions = {
     async jwt({ token, account }: { token: JWT; account?: any }): Promise<JWT> {
       if (account) {
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token ?? token.refreshToken;
       }
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
       return session;
     },
   },
