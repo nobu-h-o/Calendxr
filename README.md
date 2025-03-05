@@ -6,85 +6,33 @@
 
 These instructions will help you set up the project on your local machine for development and testing. See the deployment section for notes on how to deploy the project in a live environment.
 
-### 📋 Prerequisites (仮)
+## ⚡ Features
 
-Make sure you have the following installed before proceeding:
+Calendxr provides an AI-powered smart calendar experience with the following key features:
 
-```
-- Node.js (vXX.X.X or later)
-- npm or yarn
-- Docker (if applicable)
-- PostgreSQL / MySQL / MongoDB (depending on your database choice)
-```
+- **Voice & Image Input:** Create events using speech or photos.
+- **Automated Event Suggestions:** AI detects potential events from messages and images.
 
-### 🔧 Installing (仮)
+- **Smart Group Scheduling:** Easily organize group events without the usual hassle.
 
-Follow these steps to set up your development environment:
-
-1. **Clone the repository**
-   ```sh
-   git clone https://github.com/your-repo/calendxr.git
-   cd calendxr
-   ```
-2. **Install dependencies**
-   ```sh
-   npm install  # or yarn install
-   ```
-3. **Set up environment variables**
-   - Copy `.env.example` to `.env`
-   - Update the necessary values inside `.env`
-
-4. **Run the development server**
-   ```sh
-   npm run dev  # or yarn dev
-   ```
-
-5. **Visit the app**
-   - Open `http://localhost:3000` in your browser
-
-## 🚢 Deployment (仮)
-
-To deploy Calendxr to a live system, follow these steps:
-
-1. **Build the project**
-   ```sh
-   npm run build
-   ```
-2. **Run the production server**
-   ```sh
-   npm start
-   ```
-3. **Docker deployment (optional)**
-   ```sh
-   docker-compose up --build -d
-   ```
-
-## 🛠 Built With (仮)
+## 🛠 Built With
 
 - [Next.js](https://nextjs.org/) - The React Framework
-- [Laravel](https://laravel.com/) - Backend API
-- [PostgreSQL](https://www.postgresql.org/) - Database
-- [AWS S3](https://aws.amazon.com/s3/) - Storage for media files
+- [Fast API](https://fastapi.tiangolo.com/) - Backend API
+- [Docker](https://www.docker.com/) - Containerization
+- [Vercel](https://vercel.com/) - Frontend Server
+- [AWS](https://aws.amazon.com/) - Backend Server
+- [Google Calendar API](https://developers.google.com/calendar) - API Integration
+- [ChatGPT API](https://openai.com/) - AI Integration
 
-## 🤝 Contributing (仮)
+## 👨‍💻 Authors
 
-We welcome contributions! Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## 🔖 Versioning (仮)
-
-We use [SemVer](http://semver.org/) for versioning. For available versions, see the [tags on this repository](https://github.com/your-repo/calendxr/tags).
-
-## 👨‍💻 Authors (仮)
-
-- **Your Name** - *presenter* - [GitHub](https://github.com/your-github)
-- **Your Name** - *developer* - [GitHub](https://github.com/your-github)
-- **Your Name** - *developer* - [GitHub](https://github.com/your-github)
-- **Your Name** - *developer* - [GitHub](https://github.com/your-github)
-- **Your Name** - *developer* - [GitHub](https://github.com/your-github)
-- **Misaki Hara ⭐️** - *developer* - [GitHub](https://github.com/gostachan)
-
-See the full list of [contributors](https://github.com/your-repo/calendxr/contributors) who participated in this project.
-
+- **Miu Nicole Takagi** - *presenter* - [GitHub](https://github.com/your-github)
+- **Nobuhiro Oto** - *developer* - [GitHub](https://github.com/your-github)
+- **Ryota Tetsuka** - *developer* - [GitHub](https://github.com/your-github)
+- **Jihun Park** - *developer* - [GitHub](https://github.com/your-github)
+- **Atomu Naka** - *developer* - [GitHub](https://github.com/your-github)
+- **Misaki Hara** - *developer* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 Acknowledgments
 
