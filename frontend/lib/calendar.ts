@@ -24,10 +24,36 @@ export async function updateCalendarEvent(calendarId: string, eventId: string, u
   return response.json();
 }
 
-export async function createCalendarEvent(calendarId: string){
-  const response = await fetch("/api/calendar/create");
+export async function createCalendarEvent(calendarId: string, eventData: any) {
+  const response = await fetch("/api/calendar/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarId,
+      eventData,
+    }),
+  });
   if (!response.ok) {
     throw new Error("Failed to create calendar event");
+  }
+  return response.json();
+}
+
+export async function deleteCalendarEvent(calendarId: string, eventId: string) {
+  const response = await fetch("/api/calendar/delete", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarId,
+      eventId,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete calendar event");
   }
   return response.json();
 }
