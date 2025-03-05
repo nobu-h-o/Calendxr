@@ -29,14 +29,14 @@ Calendxr provides an AI-powered smart calendar experience with the following key
 - [ChatGPT API](https://openai.com/) - AI Integration
 - [Dify AI API](https://dify.ai/jp) - AI Chat bot Integration
 
-## 👨‍💻 Authors
+## 👨‍💻 Dev Team
 
-- **Miu Nicole Takagi** - *presenter* - [GitHub](https://github.com/mint-talltree)
-- **Nobuhiro Oto** - *developer* - [GitHub](https://github.com/nobu-h-o)
-- **Ryota Tetsuka** - *developer* - [GitHub](https://github.com/rogue1starwars)
-- **Jihun Park** - *developer* - [GitHub](https://github.com/JihunPark03)
-- **Atomu Naka** - *developer* - [GitHub](https://github.com/Cardioid22)
-- **Misaki Hara** - *developer* - [GitHub](https://github.com/gostachan)
+- **Miu Nicole Takagi** - *Project Manager* - [GitHub](https://github.com/mint-talltree)
+- **Nobuhiro Oto** - *Fullstack* - [GitHub](https://github.com/nobu-h-o)
+- **Ryota Tetsuka** - *Frontend* - [GitHub](https://github.com/rogue1starwars)
+- **Jihun Park** - *Backend* - [GitHub](https://github.com/JihunPark03)
+- **Atomu Naka** - *Backend* - [GitHub](https://github.com/Cardioid22)
+- **Misaki Hara** - *Backend & Infra* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 Acknowledgments
 
