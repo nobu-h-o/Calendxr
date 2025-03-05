@@ -81,6 +81,24 @@ export const deleteDocument = async (datasetId: string, documentId: string) => {
   return await response.json();
 };
 
+// Get a knowledge base
+export const getKnowledgeBase = async () => {
+  const response = await fetch(`${API_URL}/datasets`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error:", errorData);
+    throw new Error(`Failed to get knowledge base: ${errorData.error}`);
+  }
+
+  return await response.json();
+}
+
 //Get Document list ✅
 export const getDocumentList = async (datasetId: string) => {
   const response = await fetch(`${API_URL}/datasets/${datasetId}/documents`, {

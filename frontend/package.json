@@ -47,6 +47,7 @@
     "@shadcn/ui": "^0.0.4",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vercel/analytics": "^1.5.0",
     "ai": "^4.1.50",
     "autoprefixer": "^10.4.20",
     "bootstrap": "^5.3.3",

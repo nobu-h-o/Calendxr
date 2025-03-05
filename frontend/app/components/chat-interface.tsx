@@ -6,7 +6,7 @@ import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
-import { getMessages, sendChatMessage } from "../../utils/api";
+import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase } from "../../utils/api";
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai"
 
@@ -16,6 +16,41 @@ export function ChatInterface() {
   const [loading, setLoading] = useState(false);
   const [conversationID, setConversationID] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const api_url = "http://localhost:3000";
+  
+  useEffect(() => {
+    const fetchAndStoreCalendarData = async () => {
+      try {
+        //first delete existing data
+        const dataset = await getKnowledgeBase();
+        if (!dataset) {
+          console.error("Error fetching dataset:", dataset);
+          return;
+        }
+        const datasetId = dataset.data[dataset.data.length - 1]?.id;
+        console.log("Dataset ID:", datasetId);
+  
+        const response = await fetch(`${api_url}/api/calendar`);
+        console.log("Response:", response);
+        if (!response.ok) throw new Error("Failed to fetch calendar data");
+        const calendarData = await response.json();
+
+        // If data has changed, update the dataset
+        await createDocumentByText(datasetId, {
+          title: "Calendar Events",
+          content: JSON.stringify(calendarData),
+        });
+    
+        console.log("Calendar data updated successfully.");
+      } catch (error) {
+        console.error("Error fetching and storing calendar data:", error);
+      }
+    };
+    // Run immediately on page load
+    fetchAndStoreCalendarData();
+    
+  }, [conversationID]);
+  
 
   // Load existing messages when conversation ID changes
   useEffect(() => {
