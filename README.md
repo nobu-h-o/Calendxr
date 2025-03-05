@@ -2,7 +2,7 @@
 
 **Just speak, just snap—smartly manage your daily schedule.**
 
-## 🚀 Getting Started (仮)
+## 🚀 Getting Started
 
 These instructions will help you set up the project on your local machine for development and testing. See the deployment section for notes on how to deploy the project in a live environment.
 
@@ -11,8 +11,7 @@ These instructions will help you set up the project on your local machine for de
 Calendxr provides an AI-powered smart calendar experience with the following key features:
 
 - **Voice & Image Input:** Create events using speech or photos.
-- **Automated Event Suggestions:** AI detects potential events from messages and images.
-
+- **Automated Event Suggestions:** AI detects potential events from available dates.
 - **Smart Group Scheduling:** Easily organize group events without the usual hassle.
 
 ## 🛠 Built With
