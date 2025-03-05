@@ -1,5 +1,4 @@
 "use server";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Send an OCR request with an image

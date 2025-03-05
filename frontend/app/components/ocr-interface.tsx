@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { sendOcrImage } from "@/app/api/vision/ocr/route";
-import { getChatGPTResponse } from "../api/vision/openai/route";
+import { getChatGPTResponse } from "@/app/api/vision/openai/route";
 
 const OCR = () => {
   const [image, setImage] = useState<File | null>(null);

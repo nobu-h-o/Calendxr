@@ -1,7 +1,6 @@
 "use server";
 
 import OpenAI from "openai";
-// console.log("API Key:", process.env.OPENAI_API_KEY);
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,11 +12,18 @@ export async function getChatGPTResponse(text: string): Promise<string> {
   タイトルをつけること。\n
   日時は範囲が分かるように書くこと。\n
   日時の形式は、「'YYYY-MM-DD'」とする。\n
-  場所を出力するときは、「'場所: 」'に続いて書くこと。\n
-  その他、重要なキーワードを含めること。\n
   #入力文章 \n
   ${text}\n 
-  #`;
+  #\n
+  #出力文章は次のjson形式にすること \n
+    {
+      title: {入力文章のタイトル},
+      description: {入力文章の要約}
+      start: YYYY-MM-DDThh:mm:ss+hh:mm,
+      end: YYYY-MM-DDThh:mm:ss+hh:mm,
+    }
+  # \n
+  `;
 
   try {
     const completion = await client.chat.completions.create({
