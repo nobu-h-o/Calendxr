@@ -36,9 +36,6 @@ export async function GET() {
       title: item.summary || "No Title",
       start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
-      attendees: ((item.attendees as any[]) || []).map((attendee: any) => ({
-        name: attendee.displayName || attendee.email,
-      }))
     }));
     console.log("Fetched Events:", events);
     return NextResponse.json(events);
