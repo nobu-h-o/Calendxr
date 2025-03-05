@@ -29,7 +29,7 @@ const Calendar: React.FC = () => {
       headerToolbar={{
         left: "prev,next today",
         center: "title",
-        right: "dayGridMonth,timeGridWeek",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
       }}
       initialView="dayGridMonth"
       events={events}
