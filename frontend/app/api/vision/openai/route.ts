@@ -15,7 +15,7 @@ export async function getChatGPTResponse(text: string): Promise<string> {
   # Input Text: \n
   ${text}\n 
   #\n
-  # The output should be in the following JSON format: \n
+  # The output should be in the following JSON format (Don't put it in a code block): \n
     {
       title: {Title of the input text},
       description: {Summary of the input text},
