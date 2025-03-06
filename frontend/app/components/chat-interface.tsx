@@ -9,7 +9,7 @@ import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, d
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai";
 
-const PORT = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const PORT = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export function ChatInterface() {
   const [message, setMessage] = useState("");
