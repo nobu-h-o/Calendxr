@@ -296,7 +296,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 type="file" 
                 accept="image/*" 
                 onChange={handleImageChange} 
-                className="mb-2 file:cursor-pointer hover:file:cursor-pointer"
+                className="mb-2 cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
               />
               <Button
                 type="submit"
