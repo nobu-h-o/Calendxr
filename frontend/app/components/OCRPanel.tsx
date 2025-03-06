@@ -9,8 +9,8 @@ import { getChatGPTResponse } from "@/app/api/vision/openai/route";
 
 // Common styles to prevent overflow
 const preventOverflowStyle = {
-  overflowX: "hidden",
-  maxWidth: "100%",
+  overflowX: "hidden" as const,
+  maxWidth: "100%" as const,
   boxSizing: "border-box" as const,
   wordWrap: "break-word" as const
 };
