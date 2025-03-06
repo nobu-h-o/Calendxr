@@ -74,28 +74,91 @@ const Calendar: React.FC = () => {
     setIsFormOpen(true);
   };
 
+  // Handle date range selections
   const handleDateSelect = (selectInfo: any) => {
     setActiveSelection(selectInfo);
     
+    let startDate = selectInfo.start;
+    let endDate = selectInfo.end;
+    const allDay = selectInfo.allDay;
+    const view = selectInfo.view.type;
+    
+    // For month view, a day selection's end date is 00:00 the next day
+    // If it's a "true" single day selection, adjust so it feels like a single day
+    if (view.includes('month') && 
+        (endDate.getTime() - startDate.getTime() === 24 * 60 * 60 * 1000)) {
+      
+      // For FullCalendar UI only, make the end date the same as start date
+      // This will make it display as a single-day event in the UI
+      if (allDay) {
+        // For all-day events, keep the original dates for proper API formatting
+        // But mark it as a single day for the form
+        const singleDayEvent = {
+          title: '',
+          start: startDate,
+          end: endDate, // Keep this for Google Calendar API
+          displayEnd: startDate, // Add this for the UI to show as single day
+          allDay: true,
+          calendarId: 'primary',
+          isSingleDay: true // Flag to identify true single-day events
+        };
+        
+        setSelectedEvent(singleDayEvent);
+        setIsNewEvent(true);
+        setIsFormOpen(true);
+        return;
+      }
+    }
+    
+    // For non-single day selections or timed events
     const newEvent = {
       title: '',
-      start: selectInfo.start,
-      end: selectInfo.start,
-      allDay: selectInfo.allDay,
+      start: startDate,
+      end: endDate,
+      allDay: allDay,
       calendarId: 'primary',
     };
     
     console.log("Selected date range:", {
-      start: selectInfo.start,
-      end: selectInfo.end,
-      allDay: selectInfo.allDay,
-      view: selectInfo.view.type,
+      start: startDate,
+      end: endDate,
+      allDay: allDay,
+      view: view,
     });
     
     setSelectedEvent(newEvent);
     setIsNewEvent(true);
-    
     setIsFormOpen(true);
+  };
+  
+  // Handle date clicks (for creating single-day events)
+  const handleDateClick = (info: any) => {
+    // Only handle this for month view to avoid conflicting with time slot clicks
+    if (info.view.type === 'dayGridMonth') {
+      const clickedDate = info.date;
+      
+      // For single date clicks, create a proper single-day all-day event
+      const singleDayEvent = {
+        title: '',
+        start: clickedDate,
+        // For Google Calendar API format, end date needs to be start+1
+        // But for the UI and form we'll use the same date
+        end: new Date(new Date(clickedDate).setDate(clickedDate.getDate() + 1)),
+        displayEnd: clickedDate, // This is for displaying in the form
+        allDay: true,
+        calendarId: 'primary',
+        isSingleDay: true // Flag to identify true single-day events
+      };
+      
+      console.log("Creating single-day event:", {
+        date: clickedDate,
+        isSingleDay: true
+      });
+      
+      setSelectedEvent(singleDayEvent);
+      setIsNewEvent(true);
+      setIsFormOpen(true);
+    }
   };
 
   const handleEventChange = async (changeInfo: any) => {
@@ -165,6 +228,7 @@ const Calendar: React.FC = () => {
       }
       
       await updateCalendarEvent(calendarId, eventId, updateData);
+      await fetchEvents(); // Refresh events after update
     } catch (error) {
       console.error("Error updating event:", error);
       setError("Failed to update event. Please check on Google Calendar.");
@@ -184,6 +248,23 @@ const Calendar: React.FC = () => {
     try {
       setIsSyncing(true);
       setIsFormOpen(false);
+      
+      // Handle single day all-day events properly
+      if (selectedEvent?.isSingleDay && formValues.start?.date) {
+        // Make sure the end date is the day after the start date for Google Calendar
+        const startDateParts = formValues.start.date.split('-');
+        if (startDateParts.length === 3) {
+          const endDate = new Date(
+            parseInt(startDateParts[0]), 
+            parseInt(startDateParts[1]) - 1, 
+            parseInt(startDateParts[2]) + 1
+          );
+          
+          formValues.end = { 
+            date: endDate.toISOString().split('T')[0]
+          };
+        }
+      }
 
       if (selectedEvent?.id) {
         // Update existing event
@@ -206,6 +287,7 @@ const Calendar: React.FC = () => {
       
     } catch (error) {
       console.error("Error saving event:", error);
+      setError("Failed to save event. Please try again.");
       setIsSyncing(false);
     }
   };
@@ -227,6 +309,7 @@ const Calendar: React.FC = () => {
       
     } catch (error) {
       console.error("Error deleting event:", error);
+      setError("Failed to delete event. Please try again.");
     } finally {
       setIsSyncing(false);
     }
@@ -286,8 +369,19 @@ const Calendar: React.FC = () => {
           customButtons={{
             myCustomButton: {
               click: function () {
-                setSelectedEvent(null);
-                setIsNewEvent(false);
+                // Create a new event at the current time
+                const now = new Date();
+                const endTime = new Date(now);
+                endTime.setHours(endTime.getHours() + 1);
+                
+                setSelectedEvent({
+                  title: '',
+                  start: now,
+                  end: endTime,
+                  allDay: false,
+                  calendarId: 'primary',
+                });
+                setIsNewEvent(true);
                 setActiveSelection(null);
                 setIsFormOpen(true);
               },
@@ -304,6 +398,7 @@ const Calendar: React.FC = () => {
           eventChange={handleEventChange}
           eventClick={handleEventClick}
           select={handleDateSelect}
+          dateClick={handleDateClick} // Add handler for simple date clicks
         />
       </div>
       
@@ -315,16 +410,26 @@ const Calendar: React.FC = () => {
               <h2 className="text-xl font-semibold">
                 {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
               </h2>
+              <button 
+                onClick={handleFormClose}
+                className="rounded-full p-2 hover:bg-muted text-muted-foreground"
+                disabled={isSyncing}
+              >
+                ✕
+              </button>
             </div>
             <EventForm 
               event={selectedEvent} 
               onClose={handleFormClose}
               onFormSubmit={handleFormSubmitAndSuccess}
-              onDelete={handleEventDelete} // Add the delete handler
+              onDelete={handleEventDelete}
               disabled={isSyncing}
             />
           </div>
         )}
+      </div>
+    
+      {/* Error toast */}
       {error && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
           <span>{error}</span>
@@ -336,18 +441,6 @@ const Calendar: React.FC = () => {
           </button>
         </div>
       )}
-      </div>
-    {error && (
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
-        <span>{error}</span>
-        <button
-          onClick={() => setError(null)}
-          className="ml-4 text-white font-bold"
-        >
-          ✕
-        </button>
-      </div>
-    )}
     </div>
   );
 };
