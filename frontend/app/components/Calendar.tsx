@@ -8,6 +8,194 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { getCalendarEvents, updateCalendarEvent, createCalendarEvent, deleteCalendarEvent } from "@/lib/calendar";
 import EventForm from "./event-form";
 
+// Modern black and white theme with consistent sizing
+const calendarStyles = `
+  /* Modern black and white theme */
+  :root {
+    --fc-border-color: transparent;
+    --fc-button-bg-color: #000000;
+    --fc-button-border-color: #000000;
+    --fc-button-hover-bg-color: #333333;
+    --fc-button-hover-border-color: #333333;
+    --fc-button-active-bg-color: #333333;
+    --fc-event-bg-color: #ffffff;
+    --fc-event-border-color: #000000;
+    --fc-event-text-color: #000000;
+    --fc-today-bg-color: #f9fafb;
+    --fc-page-bg-color: #ffffff;
+    --fc-neutral-bg-color: #f3f4f6;
+    --fc-list-event-hover-bg-color: #f3f4f6;
+    --fc-highlight-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Modern styling */
+  .fc {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  /* Remove outer borders, keep inner borders subtle */
+  .fc th, .fc td {
+    border-color: #f3f4f6;
+  }
+  
+  /* Remove the outer border */
+  .fc .fc-scrollgrid {
+    border: none !important;
+  }
+  
+  .fc .fc-scrollgrid-section-header th,
+  .fc .fc-scrollgrid-section-footer td {
+    border-right: none !important;
+  }
+  
+  .fc .fc-scrollgrid-section:last-of-type td {
+    border-bottom: none !important;
+  }
+  
+  /* Style all buttons consistently */
+  .fc .fc-button {
+    min-width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .fc .fc-button-primary:not(:disabled):active,
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #333333;
+    border-color: #333333;
+  }
+
+  /* Plus button styling */
+  .fc .fc-myCustomButton-button {
+    width: 40px;
+    border-radius: 6px;
+    background-color: #000;
+  }
+
+  /* Add subtle hover effect */
+  .fc .fc-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Style the toolbar better */
+  .fc-header-toolbar {
+    padding: 0 8px;
+    margin-bottom: 16px !important;
+  }
+
+  /* Improved day/date styling */
+  .fc .fc-daygrid-day-top {
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  /* Event styling - different styles for all-day vs timed events */
+  /* Base styles for all events */
+  .fc-event {
+    border-radius: 4px !important;
+    padding: 2px 4px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500;
+    border: 1px solid #000 !important;
+    transition: transform 0.1s ease;
+  }
+  
+  /* Hover effect for all events */
+  .fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Timed events (white bg, black border, black text) */
+  .fc-timegrid-event,
+  .fc-daygrid-dot-event,
+  .fc-daygrid-event:not(.fc-daygrid-block-event) {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+  
+  /* All-day events (black bg, white text) */
+  .fc-daygrid-block-event {
+    background-color: #000 !important;
+    color: #fff !important;
+  }
+  
+  /* Make sure the title is readable for both event types */
+  .fc-daygrid-block-event .fc-event-title,
+  .fc-daygrid-block-event .fc-event-time {
+    color: #fff !important;
+  }
+  
+  .fc-timegrid-event .fc-event-title,
+  .fc-timegrid-event .fc-event-time,
+  .fc-daygrid-dot-event .fc-event-title,
+  .fc-daygrid-dot-event .fc-event-time {
+    color: #000 !important;
+  }
+
+  /* Today styling */
+  .fc .fc-day-today {
+    background-color: #f9fafb !important;
+  }
+  
+  /* Day header row */
+  .fc .fc-col-header-cell {
+    padding: 8px 0;
+    background-color: #f9fafb;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Better selection highlighting */
+  .fc .fc-highlight {
+    background-color: rgba(0,0,0,0.08);
+  }
+
+  /* TimeGrid view improvements */
+  .fc .fc-timegrid-slot {
+    height: 48px;
+  }
+
+  /* Additional list view styling */
+  .fc-list-event {
+    background-color: #fff !important;
+    border-left: 3px solid #000 !important;
+  }
+  
+  .fc-list-event td {
+    border-color: #f3f4f6 !important;
+  }
+  
+  .fc-list-event:hover td {
+    background-color: #f9fafb !important;
+  }
+  
+  .fc-list-event-dot {
+    border-color: #000 !important;
+  }
+  
+  /* For list view events */
+  .fc-list-event-title a,
+  .fc-list-event-time {
+    color: #000 !important;
+  }
+`;
+
 const Calendar: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -31,6 +219,16 @@ const Calendar: React.FC = () => {
   // Load events on component mount
   useEffect(() => {
     fetchEvents();
+    
+    // Add the custom styles to the document
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = calendarStyles;
+    document.head.appendChild(styleElement);
+    
+    // Cleanup on unmount
+    return () => {
+      document.head.removeChild(styleElement);
+    };
   }, []);
   
   const clearSelection = () => {
@@ -366,17 +564,27 @@ const Calendar: React.FC = () => {
     }
   }, [events, isFormOpen, isNewEvent, activeSelection, isSyncing]);
 
+  // Update the "add" button to ensure it's styled properly
   useEffect(() => {
-    const btn = document.querySelector('.fc-myCustomButton-button');
-    if (btn) {
-      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1v14" stroke="currentColor" stroke-width="2"/><path d="M1 8h14" stroke="currentColor" stroke-width="2"/></svg>';
-    }
+    const updateButtonStyles = () => {
+      const btn = document.querySelector('.fc-myCustomButton-button');
+      if (btn) {
+        // Modern plus icon with thinner lines
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+      }
+    };
+    
+    // Run immediately and also after a short delay to ensure the calendar has fully rendered
+    updateButtonStyles();
+    const timer = setTimeout(updateButtonStyles, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className="relative flex">
       {/* Calendar takes the full width */}
-      <div className="flex-1">
+      <div className="flex-1 bg-white rounded-lg shadow-sm">
         <FullCalendar
           ref={calendarRef}
           height="85vh"
@@ -428,8 +636,8 @@ const Calendar: React.FC = () => {
         />
       </div>
       
-      {/* Side panel form */}
-      <div className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-background border-l border-border shadow-xl w-[400px] overflow-auto`}>
+      {/* Side panel form with modern styling */}
+      <div className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-white border-l border-gray-200 shadow-xl w-[400px] overflow-auto`}>
         {isFormOpen && (
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -438,10 +646,10 @@ const Calendar: React.FC = () => {
               </h2>
               <button 
                 onClick={handleFormClose}
-                className="rounded-full p-2 hover:bg-muted text-muted-foreground"
+                className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors"
                 disabled={isSyncing}
               >
-                ✕
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
             <EventForm 
@@ -455,15 +663,15 @@ const Calendar: React.FC = () => {
         )}
       </div>
     
-      {/* Error toast */}
+      {/* Error toast with modern styling */}
       {error && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center">
           <span>{error}</span>
           <button
             onClick={() => setError(null)}
-            className="ml-4 text-white font-bold"
+            className="ml-4 text-white opacity-80 hover:opacity-100"
           >
-            ✕
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
       )}
