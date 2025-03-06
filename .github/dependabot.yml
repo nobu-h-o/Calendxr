@@ -15,6 +15,5 @@ updates:
       interval: "weekly"
   - package-ecosystem: "pip"
     directory: "backend"
-    # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "weekly"
