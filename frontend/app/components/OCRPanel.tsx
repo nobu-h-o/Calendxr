@@ -30,6 +30,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
+  const [parsedEventData, setParsedEventData] = useState<any | null>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,9 +58,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
           // Parse AI response to populate form fields
           try {
             const parsedEvent = JSON.parse(aiResult);
-            
-            // Pass the extracted event data back to the parent component
-            onEventDataExtracted(parsedEvent);
+            setParsedEventData(parsedEvent);
           } catch (parseError) {
             console.error("Error parsing AI response:", parseError);
           }
@@ -79,6 +78,9 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
   };
 
   const handleApplyAndClose = () => {
+    if (parsedEventData) {
+      onEventDataExtracted(parsedEventData);
+    }
     onClose();
   };
 
