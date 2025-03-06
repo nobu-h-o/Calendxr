@@ -100,43 +100,42 @@ const Calendar: React.FC = () => {
     
     // For month view, a day selection's end date is 00:00 the next day
     // If it's a "true" single day selection, adjust so it feels like a single day
-    if (view.includes('month') && 
-        (endDate.getTime() - startDate.getTime() === 24 * 60 * 60 * 1000)) {
-      
-      // For FullCalendar UI only, make the end date the same as start date
-      // This will make it display as a single-day event in the UI
-      if (allDay) {
-        // For all-day events, adjust the end date to be the same as start date for display
-        const adjustedEndDate = new Date(startDate); // Same as start date
-        
+    if (view.includes('month') &&
+        (endDate.getTime() - startDate.getTime() === 24 * 60 * 60 * 1000) &&
+        allDay) {
         const singleDayEvent = {
           title: '',
           start: startDate,
-          end: adjustedEndDate, // Use the same date as start for UI display
+          end: startDate, // same as start for display
           allDay: true,
           calendarId: 'primary',
-          isSingleDay: true // Flag to identify true single-day events
+          isSingleDay: true
         };
         
         setSelectedEvent(singleDayEvent);
         setIsNewEvent(true);
         setIsFormOpen(true);
         return;
-      }
+    }
+    
+    // For multi-day all-day selections, adjust end date for display (subtract one day)
+    let displayEnd = endDate;
+    if (allDay && (endDate.getTime() - startDate.getTime() > 24 * 60 * 60 * 1000)) {
+        displayEnd = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
     }
     
     // For non-single day selections or timed events
     const newEvent = {
       title: '',
       start: startDate,
-      end: endDate,
+      end: displayEnd,
       allDay: allDay,
       calendarId: 'primary',
     };
     
     console.log("Selected date range:", {
       start: startDate,
-      end: endDate,
+      end: displayEnd,
       allDay: allDay,
       view: view,
     });
