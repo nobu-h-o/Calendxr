@@ -636,73 +636,6 @@ const EventForm: React.FC<EventFormProps> = ({
         </form>
       </Form>
       
-      {/* OCR Panel */}
-      <div
-        className={`fixed right-0 top-0 bottom-0 transition-transform transform ${
-          ocrPanelOpen ? "translate-x-0" : "translate-x-full"
-        } z-50 bg-white border-l border-gray-300 shadow-xl w-[400px] overflow-auto`}
-      >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Scan Event Details</h2>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => setOcrPanelOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <form onSubmit={handleOcrSubmit} className="space-y-4">
-            <div>
-              <p className="text-sm text-gray-600 mb-2">
-                Upload an image of your event invitation, flyer, or details to automatically fill in the form.
-              </p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange} 
-                className="mb-2"
-              />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={!image || isProcessingOcr}
-              >
-                {isProcessingOcr ? "Processing..." : "Scan Image"}
-              </Button>
-            </div>
-          </form>
-
-          {extractedText && (
-            <div className="mt-4 p-3 bg-gray-50 rounded border">
-              <h3 className="text-sm font-medium mb-1">Extracted Text</h3>
-              <p className="text-xs text-gray-700 whitespace-pre-line">{extractedText}</p>
-            </div>
-          )}
-
-          {aiResponse && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-1">Analyzed Event Details</h3>
-              <div className="p-3 bg-gray-50 rounded border">
-                <pre className="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">
-                  {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
-                </pre>
-              </div>
-              <Button
-                type="button"
-                className="w-full mt-4"
-                onClick={() => setOcrPanelOpen(false)}
-              >
-                Apply & Close
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-      
       {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
@@ -724,6 +657,76 @@ const EventForm: React.FC<EventFormProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* OCR Panel - Rendered conditionally based on ocrPanelOpen state */}
+      {ocrPanelOpen && (
+        <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setOcrPanelOpen(false)}>
+          <div 
+            className="fixed right-0 top-0 bottom-0 w-[400px] bg-white shadow-xl overflow-auto z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">Scan Event Details</h2>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setOcrPanelOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <form onSubmit={handleOcrSubmit} className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upload an image of your event invitation, flyer, or details to automatically fill in the form.
+                  </p>
+                  <Input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange} 
+                    className="mb-2"
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!image || isProcessingOcr}
+                  >
+                    {isProcessingOcr ? "Processing..." : "Scan Image"}
+                  </Button>
+                </div>
+              </form>
+
+              {extractedText && (
+                <div className="mt-4 p-3 bg-gray-50 rounded border">
+                  <h3 className="text-sm font-medium mb-1">Extracted Text</h3>
+                  <p className="text-xs text-gray-700 whitespace-pre-line">{extractedText}</p>
+                </div>
+              )}
+
+              {aiResponse && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium mb-1">Analyzed Event Details</h3>
+                  <div className="p-3 bg-gray-50 rounded border">
+                    <pre className="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">
+                      {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
+                    </pre>
+                  </div>
+                  <Button
+                    type="button"
+                    className="w-full mt-4"
+                    onClick={() => setOcrPanelOpen(false)}
+                  >
+                    Apply & Close
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
