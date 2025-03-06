@@ -7,24 +7,23 @@ const client = new OpenAI({
 });
 
 export async function getChatGPTResponse(text: string): Promise<string> {
-  const prompt = `以下の文章に記載されているイベントの日時と開催場所を教えてください。ただし、返答の形式は条件にしたがって下さい。\n
-  #条件: \n
-  タイトルをつけること。\n
-  日時は範囲が分かるように書くこと。\n
-  日時の形式は、「'YYYY-MM-DD'」とする。\n
-  #入力文章 \n
+  const prompt = `Please extract the event date, time, and location from the following text. Ensure that your response follows the given conditions.\n
+  # Conditions: \n
+  - Provide a title.\n
+  - The date range should be clearly specified.\n
+  - The date format should be 'YYYY-MM-DD'.\n
+  # Input Text: \n
   ${text}\n 
   #\n
-  #出力文章は次のjson形式にすること \n
+  # The output should be in the following JSON format: \n
     {
-      title: {入力文章のタイトル},
-      description: {入力文章の要約}
+      title: {Title of the input text},
+      description: {Summary of the input text},
       start: YYYY-MM-DDThh:mm:ss+hh:mm,
       end: YYYY-MM-DDThh:mm:ss+hh:mm,
     }
   # \n
   `;
-
   try {
     const completion = await client.chat.completions.create({
       model: "gpt-4o",
@@ -34,10 +33,10 @@ export async function getChatGPTResponse(text: string): Promise<string> {
 
     return (
       completion.choices?.[0]?.message?.content ||
-      "イベント情報が見つかりませんでした。"
+      "No event information was found."
     );
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
-    return "エラーが発生しました。";
+    return "Error occurred.";
   }
 }
