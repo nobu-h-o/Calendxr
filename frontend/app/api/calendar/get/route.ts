@@ -26,6 +26,7 @@ export async function GET() {
     const res = await calendar.events.list({
       calendarId: "primary",
       timeMin: new Date('2025-01-01T00:00:00Z').toISOString(), // Fetch events from the year 2025 onwards
+      timeMax: new Date('2027-01-01T00:00:00Z').toISOString(), // Until the year 2026
       maxResults: 1000,
       singleEvents: true,
       orderBy: "startTime",
