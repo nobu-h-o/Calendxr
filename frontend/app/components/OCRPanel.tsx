@@ -296,7 +296,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 type="file" 
                 accept="image/*" 
                 onChange={handleImageChange} 
-                className="mb-2"
+                className="mb-2 file:cursor-pointer hover:file:cursor-pointer"
               />
               <Button
                 type="submit"
@@ -312,13 +312,6 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
             <div className="mt-4 p-3 bg-red-50 rounded border border-red-200">
               <h3 className="text-sm font-medium text-red-600 mb-1">Error</h3>
               <p className="text-xs text-red-700">{parseError}</p>
-            </div>
-          )}
-
-          {extractedText && (
-            <div className="mt-4 p-3 bg-gray-50 rounded border">
-              <h3 className="text-sm font-medium mb-1">Extracted Text</h3>
-              <p className="text-xs text-gray-700 whitespace-pre-line">{extractedText}</p>
             </div>
           )}
 
@@ -356,7 +349,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 className="w-full mt-4"
                 onClick={handleApplyAndClose}
               >
-                Apply & Close
+                Continue
               </Button>
             </div>
           )}
