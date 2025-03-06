@@ -1,25 +1,45 @@
-# Calendxr
-Sort all your events and tasks with Calendxr, A Modern Calendar with DX.
+# 📅 Calendxr
 
-## Development
-Copy the .env.example file and set it with the correct environment variables.
-```shell
-cp .env.example .env
-```
-### Docker
-Run docker
-```shell
-docker compose up --build
-```
-### Alternatively, run frontend and backend separately
-cd to the directory you want to develop
-```shell
-cd frontend
-npm install
-npm run dev
-```
-```shell
-cd backend
-poetry update
-poetry run python main.py
-```
+**Just speak, just snap—smartly manage your daily schedule.**
+
+## 🚀 Getting Started
+
+These instructions will help you set up the project on your local machine for development and testing. See the deployment section for notes on how to deploy the project in a live environment.
+
+## ⚡ Features
+
+Calendxr provides an AI-powered smart calendar experience with the following key features:
+
+- **Voice & Image Input:** Create events using speech or photos.
+- **Automated Event Suggestions:** AI detects potential events from available dates.
+- **Smart Group Scheduling:** Easily organize group events without the usual hassle.
+
+## 🛠 Built With
+
+### Tech stack
+- [Next.js](https://nextjs.org/) - The React Framework
+- [Fast API](https://fastapi.tiangolo.com/) - Backend API
+- [Docker](https://www.docker.com/) - Containerization
+- [Vercel](https://vercel.com/) - Frontend Server
+- [AWS](https://aws.amazon.com/) - Backend Server
+
+### APIs Used
+- [Google Calendar API](https://developers.google.com/calendar) - Google Calendar Integration
+- [Google Cloud Vision API](https://cloud.google.com/vision) - Image analysis Integration
+- [ChatGPT API](https://openai.com/) - AI Integration
+- [Dify AI API](https://dify.ai/jp) - AI Chat bot Integration
+
+## 👨‍💻 Dev Team
+
+- **Miu Nicole Takagi** - *Project Manager* - [GitHub](https://github.com/mint-talltree)
+- **Nobuhiro Oto** - *Fullstack* - [GitHub](https://github.com/nobu-h-o)
+- **Ryota Tetsuka** - *Frontend* - [GitHub](https://github.com/rogue1starwars)
+- **Jihun Park** - *Backend* - [GitHub](https://github.com/JihunPark03)
+- **Atomu Naka** - *Backend* - [GitHub](https://github.com/Cardioid22)
+- **Misaki Hara** - *Backend & Infra* - [GitHub](https://github.com/gostachan)
+
+## 🙏 Acknowledgments
+
+- Special thanks to our hackathon team
+- Huge appreciation to the hackathon organizers, judges, and fellow participants
+- Any other acknowledgments

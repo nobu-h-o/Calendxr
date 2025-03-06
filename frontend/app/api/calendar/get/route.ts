@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
  // @ts-ignore: Module 'googleapis' might need to be installed with its types.
 import { google } from "googleapis";
@@ -36,9 +36,6 @@ export async function GET() {
       title: item.summary || "No Title",
       start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
-      attendees: ((item.attendees as any[]) || []).map((attendee: any) => ({
-        name: attendee.displayName || attendee.email,
-      }))
     }));
     console.log("Fetched Events:", events);
     return NextResponse.json(events);
