@@ -249,6 +249,35 @@ const calendarStyles = `
     max-width: 100%;
     overflow-x: hidden;
   }
+
+  .fc-scroller {
+    overflow: hidden !important;
+  }
+
+  /* Only show scrollbars when necessary */
+  .fc-scroller-liquid-absolute {
+    overflow: visible !important;
+  }
+
+  /* Fix various sizing issues */
+  .fc-view-harness {
+    height: auto !important;
+  }
+
+  .fc .fc-view {
+    overflow: visible;
+  }
+
+  /* Ensure proper sizing for the calendar container */
+  .fc-view-harness-active {
+    height: auto !important;
+    min-height: 600px;
+  }
+
+  /* Make sure the day view doesn't cause unwanted scrolling */
+  .fc-timegrid-slots table {
+    height: auto !important;
+  }
 `;
 
 const Calendar: React.FC = () => {
@@ -655,55 +684,56 @@ const Calendar: React.FC = () => {
     <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
       <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
-        <FullCalendar
-          ref={calendarRef}
-          height="85vh"
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-          ]}
-          editable={true}
-          selectable={true} 
-          selectMirror={true}
-          unselectAuto={false}
-          selectLongPressDelay={0}
-          dayMaxEvents={true}
-          timeZone="local"
-          customButtons={{
-            myCustomButton: {
-              click: function () {
-                // Create a new event at the current time
-                const now = new Date();
-                const endTime = new Date(now);
-                endTime.setHours(endTime.getHours() + 1);
-                
-                setSelectedEvent({
-                  title: '',
-                  start: now,
-                  end: endTime,
-                  allDay: false,
-                  calendarId: 'primary',
-                });
-                setIsNewEvent(true);
-                setActiveSelection(null);
-                setIsFormOpen(true);
-              },
-              text: "",
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+        ]}
+        height="auto"  // Changed from "85vh" to "auto"
+        contentHeight="auto"  // Added to let content determine height
+        editable={true}
+        selectable={true} 
+        selectMirror={true}
+        unselectAuto={false}
+        selectLongPressDelay={0}
+        dayMaxEvents={true}
+        timeZone="local"
+        customButtons={{
+          myCustomButton: {
+            click: function () {
+              // Create a new event at the current time
+              const now = new Date();
+              const endTime = new Date(now);
+              endTime.setHours(endTime.getHours() + 1);
+              
+              setSelectedEvent({
+                title: '',
+                start: now,
+                end: endTime,
+                allDay: false,
+                calendarId: 'primary',
+              });
+              setIsNewEvent(true);
+              setActiveSelection(null);
+              setIsFormOpen(true);
             },
-          }}
-          headerToolbar={{
-            left: "prev,next myCustomButton",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          initialView="dayGridMonth"
-          events={events}
-          eventChange={handleEventChange}
-          eventClick={handleEventClick}
-          select={handleDateSelect}
-          dateClick={handleDateClick} // Add handler for simple date clicks
-        />
+            text: "",
+          },
+        }}
+        headerToolbar={{
+          left: "prev,next myCustomButton",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
+        }}
+        initialView="dayGridMonth"
+        events={events}
+        eventChange={handleEventChange}
+        eventClick={handleEventClick}
+        select={handleDateSelect}
+        dateClick={handleDateClick}
+      />
       </div>
       
       {/* Side panel form with fixed width and better overflow control */}
