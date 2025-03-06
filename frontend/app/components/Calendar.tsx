@@ -54,15 +54,30 @@ const Calendar: React.FC = () => {
     await fetchEvents();
     const event = clickInfo.event;
     
+    // Adjust end date for all-day events to show the actual last day (not the exclusive end date)
+    let adjustedEnd = event.end;
+    
+    if (event.allDay && event.end) {
+      // For all-day events, the API end date is exclusive (day after the event ends)
+      // Subtract one day to get the actual end date for display
+      adjustedEnd = new Date(event.end);
+      adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    }
+    
     const formattedEvent = {
       id: event.id,
       title: event.title,
       description: event.extendedProps?.description || '',
       location: event.extendedProps?.location || '',
       start: event.start,
-      end: event.end,
+      end: adjustedEnd, // Use adjusted end date
+      displayEnd: adjustedEnd, // Keep track of display end date
+      originalEnd: event.end, // Keep original end date for API
       allDay: event.allDay,
       calendarId: event.extendedProps?.calendarId || 'primary',
+      isSingleDay: event.allDay && 
+        event.start && adjustedEnd && 
+        event.start.toDateString() === adjustedEnd.toDateString() // Flag if it's a single-day event
     };
     
     console.log("Opening event for editing:", formattedEvent);
@@ -91,13 +106,13 @@ const Calendar: React.FC = () => {
       // For FullCalendar UI only, make the end date the same as start date
       // This will make it display as a single-day event in the UI
       if (allDay) {
-        // For all-day events, keep the original dates for proper API formatting
-        // But mark it as a single day for the form
+        // For all-day events, adjust the end date to be the same as start date for display
+        const adjustedEndDate = new Date(startDate); // Same as start date
+        
         const singleDayEvent = {
           title: '',
           start: startDate,
-          end: endDate, // Keep this for Google Calendar API
-          displayEnd: startDate, // Add this for the UI to show as single day
+          end: adjustedEndDate, // Use the same date as start for UI display
           allDay: true,
           calendarId: 'primary',
           isSingleDay: true // Flag to identify true single-day events
@@ -137,14 +152,13 @@ const Calendar: React.FC = () => {
     if (info.view.type === 'dayGridMonth') {
       const clickedDate = info.date;
       
-      // For single date clicks, create a proper single-day all-day event
+      // Create a single-day event with the same start and end date
+      // For a single-day event, the display should show just one day
+      // When saving, we'll adjust to API format (exclusive end date)
       const singleDayEvent = {
         title: '',
         start: clickedDate,
-        // For Google Calendar API format, end date needs to be start+1
-        // But for the UI and form we'll use the same date
-        end: new Date(new Date(clickedDate).setDate(clickedDate.getDate() + 1)),
-        displayEnd: clickedDate, // This is for displaying in the form
+        end: clickedDate, // Use the SAME date for start and end in the UI
         allDay: true,
         calendarId: 'primary',
         isSingleDay: true // Flag to identify true single-day events
@@ -249,20 +263,33 @@ const Calendar: React.FC = () => {
       setIsSyncing(true);
       setIsFormOpen(false);
       
-      // Handle single day all-day events properly
+      // Fix for all-day events, especially single-day events
       if (selectedEvent?.isSingleDay && formValues.start?.date) {
-        // Make sure the end date is the day after the start date for Google Calendar
-        const startDateParts = formValues.start.date.split('-');
-        if (startDateParts.length === 3) {
-          const endDate = new Date(
-            parseInt(startDateParts[0]), 
-            parseInt(startDateParts[1]) - 1, 
-            parseInt(startDateParts[2]) + 1
-          );
-          
-          formValues.end = { 
-            date: endDate.toISOString().split('T')[0]
-          };
+        // For single-day all-day events, we need to make the end date exclusive
+        // (the day after the start date) for the Google Calendar API
+        
+        // Parse the start date
+        const startDate = new Date(formValues.start.date);
+        
+        // Create an end date that's one day after (exclusive end date format)
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1);
+        
+        // Format as YYYY-MM-DD
+        formValues.end = { 
+          date: endDate.toISOString().split('T')[0]
+        };
+      }
+      // For multi-day all-day events, if the end date is displayed as the actual last day,
+      // we need to add one day to make it exclusive for the API
+      else if (formValues.start?.date && formValues.end?.date) {
+        const endDate = new Date(formValues.end.date);
+        
+        // If not a single-day event or no isSingleDay flag, check if adjustment needed
+        if (!selectedEvent?.isSingleDay) {
+          // Add a day to make it exclusive
+          endDate.setDate(endDate.getDate() + 1);
+          formValues.end.date = endDate.toISOString().split('T')[0];
         }
       }
 
