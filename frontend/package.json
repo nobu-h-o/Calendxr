@@ -56,7 +56,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "latest",
-    "embla-carousel-react": "8.5.1",
+    "embla-carousel-react": "8.5.2",
     "googleapis": "^146.0.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
