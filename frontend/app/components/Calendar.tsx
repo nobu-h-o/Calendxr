@@ -8,6 +8,13 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { getCalendarEvents, updateCalendarEvent, createCalendarEvent, deleteCalendarEvent } from "@/lib/calendar";
 import EventForm from "./event-form";
 
+// Style to prevent horizontal scrolling
+const preventOverflowStyle = {
+  overflowX: "hidden" as const,
+  maxWidth: "100%" as const,
+  boxSizing: "border-box" as const
+};
+
 // Modern black and white theme with consistent sizing
 const calendarStyles = `
   /* Modern black and white theme */
@@ -31,6 +38,8 @@ const calendarStyles = `
   /* Modern styling */
   .fc {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* Remove outer borders, keep inner borders subtle */
@@ -214,6 +223,31 @@ const calendarStyles = `
   .fc-list-event-title a,
   .fc-list-event-time {
     color: #000 !important;
+  }
+
+  /* Fix popover width issues */
+  .fc-popover {
+    max-width: 300px;
+    overflow-x: hidden;
+  }
+
+  .fc-popover-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Fix any potential overflow from event titles */
+  .fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Fix calendar container width issues */
+  .fc-view-harness {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 `;
 
@@ -603,9 +637,9 @@ const Calendar: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative flex">
+    <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
-      <div className="flex-1 bg-white rounded-lg shadow-sm">
+      <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
         <FullCalendar
           ref={calendarRef}
           height="85vh"
@@ -657,17 +691,20 @@ const Calendar: React.FC = () => {
         />
       </div>
       
-      {/* Side panel form with modern styling */}
-      <div className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-white border-l border-gray-200 shadow-xl w-[400px] overflow-auto`}>
+      {/* Side panel form with fixed width and better overflow control */}
+      <div 
+        className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-white border-l border-gray-200 shadow-xl w-[400px] max-w-full overflow-y-auto overflow-x-hidden`}
+        style={preventOverflowStyle}
+      >
         {isFormOpen && (
-          <div className="p-6">
+          <div className="p-6 w-full max-w-full" style={preventOverflowStyle}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
                 {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
               </h2>
               <button 
                 onClick={handleFormClose}
-                className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors"
+                className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors shrink-0"
                 disabled={isSyncing}
               >
                 {/* Fixed SVG attributes to use React camelCase */}
