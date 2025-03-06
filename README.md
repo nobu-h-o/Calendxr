@@ -51,11 +51,30 @@ You will also need:
    ```
 
 2. Set up environment variables:
+   
+   Both the frontend and backend directories have their own environment configurations:
+    
+   #### Frontend Environment
+   Copy the example environment file and update it with your values:
    ```bash
+   cd frontend
+   cp .env.example .env.local
+   ```
+    
+   #### Backend Environment
+   Copy the example environment file and update it with your values:
+   ```bash
+   cd backend
    cp .env.example .env
    ```
-   Then edit the `.env` file with your configuration values.
-
+   Required API keys and credentials:
+    - Google OAuth credentials (Client ID and Secret)
+    - Google Cloud Vision API key
+    - OpenAI API key
+    - Dify API key and endpoint
+    - NextAuth URL and secret
+    
+   Make sure to populate all necessary variables in both environment files for the application to function correctly.
 3. Choose one of the following development methods:
 
 #### Using Docker (Recommended)
@@ -82,33 +101,6 @@ poetry run uvicorn main:app --reload
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### Environment Setup
-
-Both the frontend and backend directories have their own environment configurations:
-
-#### Frontend Environment
-Copy the example environment file and update it with your values:
-```bash
-cd frontend
-cp .env.example .env.local
-```
-
-#### Backend Environment
-Copy the example environment file and update it with your values:
-```bash
-cd backend
-cp .env.example .env
-```
-
-Required API keys and credentials:
-- Google OAuth credentials (Client ID and Secret)
-- Google Cloud Vision API key
-- OpenAI API key
-- Dify API key and endpoint
-- NextAuth URL and secret
-
-Make sure to populate all necessary variables in both environment files for the application to function correctly.
 
 ## ⚡ Features
 
