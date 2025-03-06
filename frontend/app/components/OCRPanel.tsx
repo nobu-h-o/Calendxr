@@ -356,7 +356,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
 
           {aiResponse && !parsedEventData && (
             <div className="mt-4">
-              <h3 className="text-sm font-medium mb-1">AI Response (Raw)</h3>
+              <h3 className="text-sm font-medium mb-1">AI Response (Please try again)</h3>
               <div className="p-3 bg-gray-50 rounded border">
                 <pre className="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">
                   {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
