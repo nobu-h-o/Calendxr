@@ -573,22 +573,37 @@ const Calendar: React.FC = () => {
 
   // Handler for event deletion
   const handleEventDelete = async (calendarId: string, eventId: string) => {
+    console.log("Deleting event with ID:", eventId, "from calendar:", calendarId);
+    
+    if (!eventId) {
+      console.error("Cannot delete event: No event ID provided");
+      setError("Cannot delete event: No ID provided");
+      return;
+    }
+  
     try {
       setIsSyncing(true);
       
       // Close the form
       setIsFormOpen(false);
       
-      // Delete the event
-      await deleteCalendarEvent(calendarId, eventId);
-      console.log("Event deleted successfully");
+      try {
+        // Delete the event
+        await deleteCalendarEvent(calendarId, eventId);
+        console.log("Event deleted successfully");
+        
+        // Refresh events
+        await fetchEvents();
+      } catch (error: any) {
+        console.error("Error in deleteCalendarEvent:", error);
+        throw new Error(`Failed to delete event: ${error.message || 'Server error'}`);
+      }
       
-      // Refresh events
-      await fetchEvents();
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting event:", error);
-      setError("Failed to delete event. Please try again.");
+      setError(`Failed to delete event: ${error.message || 'Unknown error'}`);
+
+      setIsFormOpen(true);
     } finally {
       setIsSyncing(false);
     }
