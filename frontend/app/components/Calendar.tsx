@@ -50,7 +50,8 @@ const Calendar: React.FC = () => {
     }
   };
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = async (clickInfo: any) => {
+    await fetchEvents();
     const event = clickInfo.event;
     
     const formattedEvent = {
@@ -79,7 +80,7 @@ const Calendar: React.FC = () => {
     const newEvent = {
       title: '',
       start: selectInfo.start,
-      end: selectInfo.end,
+      end: selectInfo.start,
       allDay: selectInfo.allDay,
       calendarId: 'primary',
     };
@@ -128,26 +129,37 @@ const Calendar: React.FC = () => {
         const endDateStr = endDate.toLocaleDateString('en-CA');
         updateData.end = { date: endDateStr };
       } else {
-        const eventTimezone = event.extendedProps?.timeZone || localTimezone;
+        const toLocalISOString = (date: Date): string => {
+          const pad = (num: number) => String(num).padStart(2, '0');
+          const year = date.getFullYear();
+          const month = pad(date.getMonth() + 1);
+          const day = pad(date.getDate());
+          const hours = pad(date.getHours());
+          const minutes = pad(date.getMinutes());
+          const seconds = pad(date.getSeconds());
+          const offset = -date.getTimezoneOffset();
+          const sign = offset >= 0 ? "+" : "-";
+          const absOffset = Math.abs(offset);
+          const offsetHours = pad(Math.floor(absOffset / 60));
+          const offsetMinutes = pad(absOffset % 60);
+          return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMinutes}`;
+        };
         
         if (event.start) {
           updateData.start = {
-            dateTime: event.start.toISOString(),
-            timeZone: eventTimezone
+            dateTime: toLocalISOString(new Date(event.start))
           };
         }
         
         if (event.end) {
           updateData.end = {
-            dateTime: event.end.toISOString(),
-            timeZone: eventTimezone
+            dateTime: toLocalISOString(new Date(event.end))
           };
         } else if (event.start) {
           const endTime = new Date(event.start);
           endTime.setHours(endTime.getHours() + 1);
           updateData.end = {
-            dateTime: endTime.toISOString(),
-            timeZone: eventTimezone
+            dateTime: toLocalISOString(endTime)
           };
         }
       }
