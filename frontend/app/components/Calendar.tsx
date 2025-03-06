@@ -67,10 +67,31 @@ const calendarStyles = `
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
 
+  /* Fixed active button styles - no borders */
   .fc .fc-button-primary:not(:disabled):active,
   .fc .fc-button-primary:not(:disabled).fc-button-active {
     background-color: #333333;
-    border-color: #333333;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Also ensure no outline when focused */
+  .fc .fc-button:focus {
+    outline: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Additional style to ensure consistency */
+  .fc .fc-button-primary {
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Override hover styles to not show border */
+  .fc .fc-button:hover {
+    border-color: transparent !important;
   }
 
   /* Plus button styling */
