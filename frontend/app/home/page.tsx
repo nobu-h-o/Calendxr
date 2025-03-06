@@ -204,31 +204,31 @@ export default function LandingPage() {
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">No database storage - everything syncs directly with your Google account</span>
+                <span className="text-gray-700"><a className="font-bold">No database storage</a> - everything syncs directly with your Google account</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Your calendar events never leave your account except to be displayed to you</span>
+                <span className="text-gray-700">Your calendar events <a className="font-bold">never leave your account</a> except to be displayed to you</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Your uploaded images for event creation are processed and then discarded</span>
+                <span className="text-gray-700">Your uploaded images for event creation are processed and then <a className="font-bold">discarded</a></span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Each chat session with our AI assistant is discarded after you close it</span>
+                <span className="text-gray-700">Each chat session with our AI assistant is <a className="font-bold">discarded</a> after you close it</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Our code is 100% open source - you can verify our privacy claims yourself</span>
+                <span className="text-gray-700">Our code is 100% <a className="font-bold">open source</a> - you can verify our privacy claims yourself</span>
               </li>
             </ul>
           </div>

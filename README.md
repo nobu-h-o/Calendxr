@@ -7,6 +7,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-13.x-black)](https://nextjs.org/)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
+English | [日本語](README.jp.md)
+
 ## 📋 Table of Contents
 - [🚀 Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
