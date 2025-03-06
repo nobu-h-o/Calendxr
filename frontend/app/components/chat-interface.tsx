@@ -34,7 +34,7 @@ export function ChatInterface() {
       try {
         console.log("Dataset ID:", datasetId);
 
-        const response = await fetch(`${api_url}/api/calendar`);
+        const response = await fetch(`${api_url}/api/calendar/get`);
         console.log("Response:", response);
         if (!response.ok) throw new Error("Failed to fetch calendar data");
         const calendarData = await response.json();
