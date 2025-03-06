@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -17,7 +17,7 @@ import {
 import { Input } from "@/app/components/ui/input";
 import { Textarea } from "@/app/components/ui/textarea";
 import { Checkbox } from "@/app/components/ui/checkbox";
-import { CalendarIcon, Trash2 } from "lucide-react";
+import { CalendarIcon, Trash2, ScanLine, X } from "lucide-react";
 import { Calendar } from "@/app/components/ui/calendar";
 import {
   Popover,
@@ -34,6 +34,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/app/components/ui/alert-dialog";
+import { sendOcrImage } from "@/app/api/vision/ocr/route";
+import { getChatGPTResponse } from "@/app/api/vision/openai/route";
 
 // Create a schema with dynamic validation for end time
 const formSchema = z.object({
@@ -71,7 +73,7 @@ interface EventFormProps {
   event?: any;
   onClose?: () => void;
   onFormSubmit?: (values: any) => void;
-  onDelete?: (calendarId: string, eventId: string) => void; // Add delete handler prop
+  onDelete?: (calendarId: string, eventId: string) => void;
   disabled?: boolean;
 }
 
@@ -85,6 +87,13 @@ const EventForm: React.FC<EventFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // OCR State
+  const [ocrPanelOpen, setOcrPanelOpen] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [extractedText, setExtractedText] = useState<string | null>(null);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   
   // Initialize form with default values or event data
   const form = useForm<z.infer<typeof formSchema>>({
@@ -279,6 +288,94 @@ const EventForm: React.FC<EventFormProps> = ({
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+  
+  // OCR functions
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  const handleOcrSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!image) return;
+    
+    setIsProcessingOcr(true);
+
+    try {
+      const result = await sendOcrImage(image);
+
+      if (result.text) {
+        setExtractedText(result.text);
+        try {
+          const aiResult = await getChatGPTResponse(result.text);
+          setAiResponse(aiResult);
+          
+          // Parse AI response to populate form fields
+          try {
+            const parsedEvent = JSON.parse(aiResult);
+            
+            // Only update fields if they contain data
+            if (parsedEvent.title) {
+              form.setValue('title', parsedEvent.title);
+            }
+            
+            if (parsedEvent.description) {
+              form.setValue('description', parsedEvent.description);
+            }
+            
+            if (parsedEvent.location) {
+              form.setValue('location', parsedEvent.location);
+            }
+            
+            // Handle date and time
+            if (parsedEvent.startDate) {
+              const startDate = new Date(parsedEvent.startDate);
+              if (!isNaN(startDate.getTime())) {
+                form.setValue('startDate', startDate);
+                
+                // Set start time if available
+                if (parsedEvent.startTime) {
+                  form.setValue('startTime', parsedEvent.startTime);
+                }
+              }
+            }
+            
+            if (parsedEvent.endDate) {
+              const endDate = new Date(parsedEvent.endDate);
+              if (!isNaN(endDate.getTime())) {
+                form.setValue('endDate', endDate);
+                
+                // Set end time if available
+                if (parsedEvent.endTime) {
+                  form.setValue('endTime', parsedEvent.endTime);
+                }
+              }
+            }
+            
+            // Set all-day flag if specified
+            if (parsedEvent.allDay !== undefined) {
+              form.setValue('allDay', parsedEvent.allDay);
+            }
+          } catch (parseError) {
+            console.error("Error parsing AI response:", parseError);
+          }
+        } catch (aiError) {
+          console.error("Error getting AI response:", aiError);
+          setAiResponse("Failed to process the request.");
+        }
+      } else {
+        setExtractedText("Failed to extract text.");
+      }
+    } catch (ocrError) {
+      console.error("OCR processing error:", ocrError);
+      setExtractedText("Error processing image.");
+    } finally {
+      setIsProcessingOcr(false);
     }
   };
   
@@ -506,8 +603,17 @@ const EventForm: React.FC<EventFormProps> = ({
               </Button>
             )}
             
-            {/* Empty div for spacing when there's no delete button */}
-            {!event?.id && <div></div>}
+            {/* OCR Button */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOcrPanelOpen(true)}
+              disabled={isSubmitting || isDeleting || disabled}
+              className="flex items-center"
+            >
+              <ScanLine className="mr-2 h-4 w-4" />
+              Scan Event
+            </Button>
             
             {/* Save/Cancel buttons */}
             <div className="flex space-x-2">
@@ -529,6 +635,73 @@ const EventForm: React.FC<EventFormProps> = ({
           </div>
         </form>
       </Form>
+      
+      {/* OCR Panel */}
+      <div
+        className={`fixed right-0 top-0 bottom-0 transition-transform transform ${
+          ocrPanelOpen ? "translate-x-0" : "translate-x-full"
+        } z-50 bg-white border-l border-gray-300 shadow-xl w-[400px] overflow-auto`}
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Scan Event Details</h2>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setOcrPanelOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <form onSubmit={handleOcrSubmit} className="space-y-4">
+            <div>
+              <p className="text-sm text-gray-600 mb-2">
+                Upload an image of your event invitation, flyer, or details to automatically fill in the form.
+              </p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageChange} 
+                className="mb-2"
+              />
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={!image || isProcessingOcr}
+              >
+                {isProcessingOcr ? "Processing..." : "Scan Image"}
+              </Button>
+            </div>
+          </form>
+
+          {extractedText && (
+            <div className="mt-4 p-3 bg-gray-50 rounded border">
+              <h3 className="text-sm font-medium mb-1">Extracted Text</h3>
+              <p className="text-xs text-gray-700 whitespace-pre-line">{extractedText}</p>
+            </div>
+          )}
+
+          {aiResponse && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium mb-1">Analyzed Event Details</h3>
+              <div className="p-3 bg-gray-50 rounded border">
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">
+                  {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
+                </pre>
+              </div>
+              <Button
+                type="button"
+                className="w-full mt-4"
+                onClick={() => setOcrPanelOpen(false)}
+              >
+                Apply & Close
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
       
       {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>

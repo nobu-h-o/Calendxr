@@ -4,7 +4,6 @@ import Calendar from "@/app/components/Calendar";
 import { ChatInterface } from "@/app/components/chat-interface";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import OCR from "./components/ocr-interface";
 
 export default function CalendarApp() {
   const { data: session } = useSession();
@@ -40,7 +39,6 @@ export default function CalendarApp() {
       <main className="flex-1 grid gap-6 md:grid-cols-[1fr_350px] lg:grid-cols-[1fr_400px] p-4 pt-6">
         <Calendar />
         <ChatInterface />
-        <OCR />
       </main>
     </div>
   );
