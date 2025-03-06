@@ -19,6 +19,7 @@ export async function getChatGPTResponse(text: string): Promise<string> {
     {
       title: {Title of the input text},
       description: {Summary of the input text},
+      location: {Location of the event},
       start: YYYY-MM-DDThh:mm:ss+hh:mm,
       end: YYYY-MM-DDThh:mm:ss+hh:mm,
     }
