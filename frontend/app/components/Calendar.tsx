@@ -15,7 +15,7 @@ const preventOverflowStyle = {
   boxSizing: "border-box" as const
 };
 
-// Modern black and white theme with consistent sizing and responsive design
+// Modern black and white theme with consistent sizing
 const calendarStyles = `
   /* Modern black and white theme */
   :root {
@@ -126,30 +126,34 @@ const calendarStyles = `
     gap: 8px;
   }
   
-  /* Responsive toolbar for mobile */
+  /* Mobile-friendly toolbar layout */
   @media (max-width: 640px) {
     .fc-header-toolbar {
       flex-direction: column;
       align-items: center;
+      gap: 12px;
     }
     
     .fc-header-toolbar .fc-toolbar-chunk {
-      margin-bottom: 8px;
       display: flex;
       justify-content: center;
       width: 100%;
     }
     
-    .fc-header-toolbar .fc-toolbar-chunk:last-child {
-      margin-bottom: 0;
+    /* Order toolbar sections */
+    .fc-header-toolbar .fc-right {
+      order: 1; /* View buttons first */
     }
     
-    .fc-button-group {
-      display: flex;
-      width: 100%;
-      justify-content: center;
+    .fc-header-toolbar .fc-left {
+      order: 2; /* Navigation buttons second */
     }
     
+    .fc-header-toolbar .fc-center {
+      order: 3; /* Title last */
+    }
+    
+    /* Improve button sizing */
     .fc-button {
       padding: 0 8px !important;
       font-size: 0.8rem !important;
@@ -332,6 +336,24 @@ const calendarStyles = `
       height: 70vh !important;
     }
   }
+  
+  /* Mobile add button */
+  .mobile-add-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 30;
+    border: none;
+  }
 `;
 
 const Calendar: React.FC = () => {
@@ -395,6 +417,48 @@ const Calendar: React.FC = () => {
       document.head.removeChild(styleElement);
     };
   }, []);
+  
+  // Add mobile floating action button
+  useEffect(() => {
+    if (viewportWidth < 640 && !document.querySelector('.mobile-add-button')) {
+      const floatingBtn = document.createElement('button');
+      floatingBtn.className = 'mobile-add-button';
+      floatingBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+      
+      floatingBtn.addEventListener('click', () => {
+        const now = new Date();
+        const endTime = new Date(now);
+        endTime.setHours(endTime.getHours() + 1);
+        
+        setSelectedEvent({
+          title: '',
+          start: now,
+          end: endTime,
+          allDay: false,
+          calendarId: 'primary',
+        });
+        setIsNewEvent(true);
+        setActiveSelection(null);
+        setIsFormOpen(true);
+      });
+      
+      document.body.appendChild(floatingBtn);
+      
+      return () => {
+        if (document.querySelector('.mobile-add-button')) {
+          document.body.removeChild(document.querySelector('.mobile-add-button')!);
+        }
+      };
+    }
+    
+    // Update desktop add button
+    const btn = document.querySelector('.fc-myCustomButton-button');
+    if (btn) {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+    }
+    
+    return () => {};
+  }, [viewportWidth, setSelectedEvent, setIsNewEvent, setActiveSelection, setIsFormOpen]);
   
   const clearSelection = () => {
     if (isNewEvent && calendarRef.current) {
@@ -518,40 +582,20 @@ const Calendar: React.FC = () => {
     // Only handle this for month view to avoid conflicting with time slot clicks
     if (info.view.type === 'dayGridMonth') {
       // For touch devices, we'll use date click to show events on that day or create a new event
-      if (isTouchDevice) {
-        // If there are events on this day, we could implement a day-details view here
-        // For now, let's create a new event
-        const clickedDate = info.date;
-        
-        const singleDayEvent = {
-          title: '',
-          start: clickedDate,
-          end: clickedDate,
-          allDay: true,
-          calendarId: 'primary',
-          isSingleDay: true
-        };
-        
-        setSelectedEvent(singleDayEvent);
-        setIsNewEvent(true);
-        setIsFormOpen(true);
-      } else {
-        // Non-touch devices use the same behavior as before
-        const clickedDate = info.date;
-        
-        const singleDayEvent = {
-          title: '',
-          start: clickedDate,
-          end: clickedDate,
-          allDay: true,
-          calendarId: 'primary',
-          isSingleDay: true
-        };
-        
-        setSelectedEvent(singleDayEvent);
-        setIsNewEvent(true);
-        setIsFormOpen(true);
-      }
+      const clickedDate = info.date;
+      
+      const singleDayEvent = {
+        title: '',
+        start: clickedDate,
+        end: clickedDate,
+        allDay: true,
+        calendarId: 'primary',
+        isSingleDay: true
+      };
+      
+      setSelectedEvent(singleDayEvent);
+      setIsNewEvent(true);
+      setIsFormOpen(true);
     }
   };
 
@@ -762,23 +806,6 @@ const Calendar: React.FC = () => {
     }
   }, [events, isFormOpen, isNewEvent, activeSelection, isSyncing, isTouchDevice]);
 
-  // Update the "add" button to ensure it's styled properly
-  useEffect(() => {
-    const updateButtonStyles = () => {
-      const btn = document.querySelector('.fc-myCustomButton-button');
-      if (btn) {
-        // Modern plus icon with thinner lines - Fixed SVG attributes to use React camelCase with larger size
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
-      }
-    };
-    
-    // Run immediately and also after a short delay to ensure the calendar has fully rendered
-    updateButtonStyles();
-    const timer = setTimeout(updateButtonStyles, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   // Get initial view based on screen size
   const getInitialView = () => {
     if (viewportWidth < 640) {
@@ -790,37 +817,13 @@ const Calendar: React.FC = () => {
   // Determine if selectable should be enabled (disabled on touch devices)
   const isSelectableEnabled = !isTouchDevice;
 
-  // Adjust the headerToolbar based on screen size
-  const getHeaderToolbar = () => {
-    if (viewportWidth < 640) {
-      return {
-        left: "prev,next",
-        center: "title",
-        right: "myCustomButton"
-      };
-    }
-    return {
-      left: "prev,next myCustomButton",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay"
-    };
-  };
-
-  // Determine the appropriate height for the calendar
-  const getCalendarHeight = () => {
-    if (viewportWidth < 640) {
-      return 'auto'; // Auto height on mobile
-    }
-    return '85vh'; // Fixed height on desktop
-  };
-
   return (
     <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
       <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
         <FullCalendar
           ref={calendarRef}
-          height={getCalendarHeight()}
+          height={viewportWidth < 640 ? 'auto' : '85vh'}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,
@@ -855,19 +858,27 @@ const Calendar: React.FC = () => {
               text: "",
             },
           }}
-          headerToolbar={getHeaderToolbar()}
+          headerToolbar={
+            viewportWidth < 640 
+              ? { 
+                  // Mobile layout with views on top, then navigation, then title
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                  left: 'prev,next',
+                  center: 'title',
+                }
+              : {
+                  // Desktop layout
+                  left: 'prev,next myCustomButton',
+                  center: 'title',
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                }
+          }
           initialView={getInitialView()}
           events={events}
           eventChange={handleEventChange}
           eventClick={handleEventClick}
           select={handleDateSelect}
           dateClick={handleDateClick}
-          // Add footer buttons for mobile
-          footerToolbar={
-            viewportWidth < 640 ? {
-              center: 'dayGridMonth,timeGridWeek,timeGridDay'
-            } : undefined
-          }
         />
       </div>
       
