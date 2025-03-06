@@ -5,7 +5,7 @@ import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
-import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase } from "../../utils/api";
+import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai"
 import { getCalendarEvents } from "@/lib/calendar"
@@ -19,25 +19,37 @@ export function ChatInterface() {
   
   useEffect(() => {
     const fetchAndStoreCalendarData = async () => {
-      try {
-        //first delete existing data
-        const dataset = await getKnowledgeBase();
-        if (!dataset) {
-          console.error("Error fetching dataset:", dataset);
-          return;
-        }
-        const datasetId = dataset.data[dataset.data.length - 1]?.id;
-        console.log("Dataset ID:", datasetId);
-  
-        const calendarData = await getCalendarEvents();
-        console.log("Calendar Events:", calendarData);
 
+      const dataset = await getKnowledgeBase();
+      if (!dataset) {
+        console.error("Error fetching dataset:", dataset);
+        return;
+      }
+      const datasetId = dataset.data[dataset.data.length - 1]?.id;
+      const documents = await getDocumentList(datasetId);
+      
+      documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
+
+      try {
+        console.log("Dataset ID:", datasetId);
+
+        const response = await fetch(`${api_url}/api/calendar/get`);
+        console.log("Response:", response);
+        if (!response.ok) throw new Error("Failed to fetch calendar data");
+        const calendarData = await response.json();
+
+        const filteredData = calendarData.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
+          title,
+          start : new Date(start),
+          end: new Date(end),
+        }));
+  
         // If data has changed, update the dataset
         await createDocumentByText(datasetId, {
           title: "Calendar Events",
-          content: JSON.stringify(calendarData),
+          content: JSON.stringify(filteredData),
         });
-    
+  
         console.log("Calendar data updated successfully.");
       } catch (error) {
         console.error("Error fetching and storing calendar data:", error);
