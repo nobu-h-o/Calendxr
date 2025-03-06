@@ -7,11 +7,9 @@ import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
 import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
 import { useState, useEffect, useRef } from "react";
-import { UIMessage } from "ai"
+import { UIMessage } from "ai";
 
 const PORT = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-const PORT = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function ChatInterface() {
   const [message, setMessage] = useState("");
