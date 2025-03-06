@@ -15,10 +15,11 @@ export async function getChatGPTResponse(text: string): Promise<string> {
   # Input Text: \n
   ${text}\n 
   #\n
-  # The output should be in the following JSON format: \n
+  # The output should be in the following JSON format (Don't put it in a code block): \n
     {
       title: {Title of the input text},
       description: {Summary of the input text},
+      location: {Location of the event},
       start: YYYY-MM-DDThh:mm:ss+hh:mm,
       end: YYYY-MM-DDThh:mm:ss+hh:mm,
     }
@@ -26,7 +27,7 @@ export async function getChatGPTResponse(text: string): Promise<string> {
   `;
   try {
     const completion = await client.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [{ role: "system", content: prompt }],
       max_tokens: 100,
     });
