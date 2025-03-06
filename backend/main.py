@@ -13,8 +13,7 @@ load_dotenv()
 DIFY_API_KEY = os.getenv("DIFY_API_KEY")
 DIFY_API_DATASET_KEY = os.getenv("DIFY_API_DATASET_KEY")
 DIFY_API_URL = os.getenv("DIFY_API_URL")
-GCV_FILE_NAME = os.getenv("GCV_FILE_NAME")
-BASE_DIR = os.getenv("BASE_DIR")
+PATH_TO_GCV_JSON_FILE = os.getenv("PATH_TO_GCV_JSON_FILE")
 
 app = FastAPI()
 
@@ -350,11 +349,7 @@ def get_messages(conversation_id: str):
 # Send Texts Read from Image
 @app.post("/ocr")
 async def ocr_image(image: UploadFile = File(...)):
-    base_dir = BASE_DIR
-    json_filename = GCV_FILE_NAME
-    credential_path = os.path.join(base_dir, json_filename)
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credential_path
-
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = PATH_TO_GCV_JSON_FILE
     client = vision.ImageAnnotatorClient()
     content = await image.read()
     vision_image = vision.Image(content=content)
