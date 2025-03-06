@@ -1,6 +1,5 @@
 "use client"
 import { Send } from "lucide-react"
-import { useChat } from "ai/react"
 
 import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
@@ -9,6 +8,7 @@ import { ScrollArea } from "@/app/components/ui/scroll-area"
 import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai"
+import { getCalendarEvents } from "@/lib/calendar"
 
 export function ChatInterface() {
   const [message, setMessage] = useState("");
@@ -16,7 +16,6 @@ export function ChatInterface() {
   const [loading, setLoading] = useState(false);
   const [conversationID, setConversationID] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const api_url = "http://localhost:3000";
   
   useEffect(() => {
     const fetchAndStoreCalendarData = async () => {

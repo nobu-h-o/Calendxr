@@ -34,6 +34,7 @@ export async function GET() {
     const events = ((res.data.items as any[]) || []).map((item: any) => ({
       id: item.id,
       title: item.summary || "No Title",
+      description: item.description || "",
       start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
     }));

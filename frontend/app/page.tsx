@@ -26,7 +26,12 @@ export default function CalendarApp() {
                   className="w-8 h-8 rounded-full"
                 />
               </a>
-              <button onClick={() => signOut()} className="px-4 py-2 font-medium text-black bg-white rounded border border-black hover:bg-gray-200">Sign Out</button>
+              <button
+                onClick={() => signOut()}
+                className="px-4 py-2 font-medium text-black bg-white rounded border border-black hover:bg-gray-200"
+              >
+                Sign Out
+              </button>
             </div>
           )}
         </div>
