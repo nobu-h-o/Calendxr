@@ -8,6 +8,13 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { getCalendarEvents, updateCalendarEvent, createCalendarEvent, deleteCalendarEvent } from "@/lib/calendar";
 import EventForm from "./event-form";
 
+// Style to prevent horizontal scrolling
+const preventOverflowStyle = {
+  overflowX: "hidden" as const,
+  maxWidth: "100%" as const,
+  boxSizing: "border-box" as const
+};
+
 // Modern black and white theme with consistent sizing
 const calendarStyles = `
   /* Modern black and white theme */
@@ -31,6 +38,8 @@ const calendarStyles = `
   /* Modern styling */
   .fc {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* Remove outer borders, keep inner borders subtle */
@@ -67,10 +76,31 @@ const calendarStyles = `
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
 
+  /* Fixed active button styles - no borders */
   .fc .fc-button-primary:not(:disabled):active,
   .fc .fc-button-primary:not(:disabled).fc-button-active {
     background-color: #333333;
-    border-color: #333333;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Also ensure no outline when focused */
+  .fc .fc-button:focus {
+    outline: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Additional style to ensure consistency */
+  .fc .fc-button-primary {
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Override hover styles to not show border */
+  .fc .fc-button:hover {
+    border-color: transparent !important;
   }
 
   /* Plus button styling */
@@ -193,6 +223,31 @@ const calendarStyles = `
   .fc-list-event-title a,
   .fc-list-event-time {
     color: #000 !important;
+  }
+
+  /* Fix popover width issues */
+  .fc-popover {
+    max-width: 300px;
+    overflow-x: hidden;
+  }
+
+  .fc-popover-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Fix any potential overflow from event titles */
+  .fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Fix calendar container width issues */
+  .fc-view-harness {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 `;
 
@@ -569,8 +624,8 @@ const Calendar: React.FC = () => {
     const updateButtonStyles = () => {
       const btn = document.querySelector('.fc-myCustomButton-button');
       if (btn) {
-        // Modern plus icon with thinner lines
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+        // Modern plus icon with thinner lines - Fixed SVG attributes to use React camelCase with larger size
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
       }
     };
     
@@ -582,9 +637,9 @@ const Calendar: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative flex">
+    <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
-      <div className="flex-1 bg-white rounded-lg shadow-sm">
+      <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
         <FullCalendar
           ref={calendarRef}
           height="85vh"
@@ -636,20 +691,24 @@ const Calendar: React.FC = () => {
         />
       </div>
       
-      {/* Side panel form with modern styling */}
-      <div className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-white border-l border-gray-200 shadow-xl w-[400px] overflow-auto`}>
+      {/* Side panel form with fixed width and better overflow control */}
+      <div 
+        className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-white border-l border-gray-200 shadow-xl w-[400px] max-w-full overflow-y-auto overflow-x-hidden`}
+        style={preventOverflowStyle}
+      >
         {isFormOpen && (
-          <div className="p-6">
+          <div className="p-6 w-full max-w-full" style={preventOverflowStyle}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
                 {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
               </h2>
               <button 
                 onClick={handleFormClose}
-                className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors"
+                className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors shrink-0"
                 disabled={isSyncing}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                {/* Fixed SVG attributes to use React camelCase */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
             <EventForm 
@@ -671,7 +730,8 @@ const Calendar: React.FC = () => {
             onClick={() => setError(null)}
             className="ml-4 text-white opacity-80 hover:opacity-100"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            {/* Fixed SVG attributes to use React camelCase */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
       )}

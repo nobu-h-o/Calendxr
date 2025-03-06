@@ -17,7 +17,7 @@ import {
 import { Input } from "@/app/components/ui/input";
 import { Textarea } from "@/app/components/ui/textarea";
 import { Checkbox } from "@/app/components/ui/checkbox";
-import { CalendarIcon, Trash2 } from "lucide-react";
+import { CalendarIcon, Trash2, ScanLine } from "lucide-react";
 import { Calendar } from "@/app/components/ui/calendar";
 import {
   Popover,
@@ -34,6 +34,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/app/components/ui/alert-dialog";
+
+// Import our new OCRPanel component
+import OCRPanel from "./OCRPanel";
 
 // Create a schema with dynamic validation for end time
 const formSchema = z.object({
@@ -71,7 +74,7 @@ interface EventFormProps {
   event?: any;
   onClose?: () => void;
   onFormSubmit?: (values: any) => void;
-  onDelete?: (calendarId: string, eventId: string) => void; // Add delete handler prop
+  onDelete?: (calendarId: string, eventId: string) => void;
   disabled?: boolean;
 }
 
@@ -85,6 +88,9 @@ const EventForm: React.FC<EventFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // OCR panel state
+  const [ocrPanelOpen, setOcrPanelOpen] = useState(false);
   
   // Initialize form with default values or event data
   const form = useForm<z.infer<typeof formSchema>>({
@@ -279,6 +285,52 @@ const EventForm: React.FC<EventFormProps> = ({
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+  
+  // Handler for event data received from OCRPanel
+  const handleEventDataExtracted = (parsedEvent: any) => {
+    // Only update fields if they contain data
+    if (parsedEvent.title) {
+      form.setValue('title', parsedEvent.title);
+    }
+    
+    if (parsedEvent.description) {
+      form.setValue('description', parsedEvent.description);
+    }
+    
+    if (parsedEvent.location) {
+      form.setValue('location', parsedEvent.location);
+    }
+    
+    // Handle date and time
+    if (parsedEvent.startDate) {
+      const startDate = new Date(parsedEvent.startDate);
+      if (!isNaN(startDate.getTime())) {
+        form.setValue('startDate', startDate);
+        
+        // Set start time if available
+        if (parsedEvent.startTime) {
+          form.setValue('startTime', parsedEvent.startTime);
+        }
+      }
+    }
+    
+    if (parsedEvent.endDate) {
+      const endDate = new Date(parsedEvent.endDate);
+      if (!isNaN(endDate.getTime())) {
+        form.setValue('endDate', endDate);
+        
+        // Set end time if available
+        if (parsedEvent.endTime) {
+          form.setValue('endTime', parsedEvent.endTime);
+        }
+      }
+    }
+    
+    // Set all-day flag if specified
+    if (parsedEvent.allDay !== undefined) {
+      form.setValue('allDay', parsedEvent.allDay);
     }
   };
   
@@ -505,9 +557,19 @@ const EventForm: React.FC<EventFormProps> = ({
                 Delete
               </Button>
             )}
-            
-            {/* Empty div for spacing when there's no delete button */}
-            {!event?.id && <div></div>}
+            {/* OCR Button */}
+            {(!event?.id) && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOcrPanelOpen(true)}
+                disabled={isSubmitting || isDeleting || disabled}
+                className="flex items-center"
+              >
+                <ScanLine className="mr-2 h-4 w-4" />
+                Scan Event
+              </Button>
+            )}
             
             {/* Save/Cancel buttons */}
             <div className="flex space-x-2">
@@ -531,26 +593,35 @@ const EventForm: React.FC<EventFormProps> = ({
       </Form>
       
       {/* Delete confirmation dialog */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Event</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this event? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete} 
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {showDeleteConfirm && (
+        <AlertDialog>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Event</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this event? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+      
+      {/* OCR Panel Component */}
+      <OCRPanel
+        isOpen={ocrPanelOpen}
+        onClose={() => setOcrPanelOpen(false)}
+        onEventDataExtracted={handleEventDataExtracted}
+      />
     </>
   );
 };
