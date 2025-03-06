@@ -32,7 +32,10 @@ export async function POST(request: Request) {
     }
     
     // 4. Validate request parameters
-    const { calendarId, eventData } = body;
+    const { calendarId, eventData, calendarDescription } = body;
+    if (calendarDescription) {
+      eventData.description = calendarDescription;
+    }
     if (!calendarId || !eventData) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
