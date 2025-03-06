@@ -257,6 +257,13 @@ const Calendar: React.FC = () => {
     }
   }, [events, isFormOpen, isNewEvent, activeSelection, isSyncing]);
 
+  useEffect(() => {
+    const btn = document.querySelector('.fc-myCustomButton-button');
+    if (btn) {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1v14" stroke="currentColor" stroke-width="2"/><path d="M1 8h14" stroke="currentColor" stroke-width="2"/></svg>';
+    }
+  }, []);
+
   return (
     <div className="relative flex">
       {/* Calendar takes the full width */}
@@ -284,7 +291,7 @@ const Calendar: React.FC = () => {
                 setActiveSelection(null);
                 setIsFormOpen(true);
               },
-              icon: "plus-lg",
+              text: "",
             },
           }}
           headerToolbar={{
