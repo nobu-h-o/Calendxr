@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/nobu-h-o/Calendxr?style=social)](https://github.com/nobu-h-o/Calendxr/stargazers)
 [![GitHub license](https://img.shields.io/github/license/nobu-h-o/Calendxr)](https://github.com/nobu-h-o/Calendxr/blob/main/LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-13.x-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-black)](https://nextjs.org/)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
 English | [日本語](README.jp.md)
