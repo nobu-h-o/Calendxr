@@ -15,6 +15,8 @@ DIFY_API_DATASET_KEY = os.getenv("DIFY_API_DATASET_KEY")
 DIFY_API_URL = os.getenv("DIFY_API_URL")
 PATH_TO_GCV_JSON_FILE = os.getenv("PATH_TO_GCV_JSON_FILE")
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = PATH_TO_GCV_JSON_FILE
+
 app = FastAPI()
 
 app.add_middleware(
@@ -349,7 +351,6 @@ def get_messages(conversation_id: str):
 # Send Texts Read from Image
 @app.post("/ocr")
 async def ocr_image(image: UploadFile = File(...)):
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = PATH_TO_GCV_JSON_FILE
     client = vision.ImageAnnotatorClient()
     content = await image.read()
     vision_image = vision.Image(content=content)
