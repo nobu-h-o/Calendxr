@@ -260,4 +260,137 @@ export const calendarStyles = `
 .fc-timegrid-slots table {
   height: auto !important;
 }
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  /* Adjust header toolbar for mobile */
+  .fc .fc-header-toolbar {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem !important;
+    padding: 0;
+  }
+  
+  .fc .fc-header-toolbar .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  /* Center title */
+  .fc .fc-toolbar-title {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+  
+  /* Adjust button sizes for better touch targets */
+  .fc .fc-button {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 8px;
+    font-size: 0.85rem;
+    margin: 0 2px;
+  }
+  
+  /* Adjust day cell sizing */
+  .fc .fc-daygrid-day {
+    min-height: 3.5rem;
+  }
+  
+  /* Make event text more readable on small screens */
+  .fc-event {
+    font-size: 0.75rem !important;
+  }
+  
+  /* Smaller day numbers on mobile */
+  .fc .fc-daygrid-day-number {
+    font-size: 0.8rem;
+  }
+  
+  /* Adjust popover for touch screens */
+  .fc-popover {
+    max-width: 85vw;
+  }
+  
+  /* Week view adjustments */
+  .fc-timeGridWeek-view .fc-col-header-cell {
+    padding: 4px 0;
+    font-size: 0.7rem;
+  }
+  
+  /* Day view adjustments */
+  .fc-timeGridDay-view .fc-timegrid-slot {
+    height: 3rem;
+  }
+
+  /* Improve vertical rhythm */
+  .fc .fc-toolbar-chunk:nth-child(2) {
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Button group layout */
+  .fc .fc-button-group {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Previous/next and view buttons should be full width */
+  .fc .fc-button-group .fc-button {
+    flex: 1;
+  }
+  
+  /* Adjust footer toolbar for better mobile experience */
+  .fc-footer-toolbar {
+    margin-top: 1rem !important;
+  }
+  
+  /* Limit visible events on mobile to prevent overflow */
+  .fc-daygrid-more-link {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 1px 3px;
+    margin-top: 2px;
+  }
+  
+  /* Ensure the "add" button is properly visible and sized on mobile */
+  .fc .fc-myCustomButton-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Adjust time grid hours column width on mobile */
+  .fc .fc-timegrid-axis {
+    width: 35px !important;
+  }
+  
+  /* Fix week view cells on mobile to be more readable */
+  .fc .fc-timeGridWeek-view .fc-col-header-cell-cushion {
+    font-size: 0.7rem;
+    white-space: normal;
+    display: block;
+  }
+  
+  /* Reduce min height on mobile for better fit on smaller screens */
+  .fc-view-harness-active {
+    min-height: 400px !important;
+  }
+  
+  /* Ensure event form takes full width on mobile */
+  .event-form-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Make calendar fit better on small screens */
+  .fc {
+    font-size: 0.9rem;
+  }
+  
+  /* Improve event tooltips/popovers on mobile */
+  .fc-event-tooltip, .fc-popover-body {
+    font-size: 0.8rem;
+  }
+}
 `;
