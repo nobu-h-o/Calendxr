@@ -4,8 +4,8 @@ import { AuthProvider } from './components/auth-provider';
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Calendxr',
+  description: 'Simplify your Calendar, with the power of AI',
   generator: 'v0.dev',
 }
 
