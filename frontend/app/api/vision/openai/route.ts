@@ -7,13 +7,16 @@ const client = new OpenAI({
 });
 
 export async function getChatGPTResponse(text: string): Promise<string> {
-  const prompt = `Please extract the event date, time, and location from the following text. Ensure that your response follows the given conditions. If you cannot find an end date, just make it the same day as the start date.\n
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  });
+  const prompt = `Today is ${today}. Please extract the event date, time, and location from the following text. Ensure that your response follows the given conditions. If you cannot find an end date, just make it an hour after the end date.\n
   # Conditions: \n
   - Provide a title.\n
   - The date range should be clearly specified.\n
   - The date format should be 'YYYY-MM-DD'.\n
   # Input Text: \n
-  ${text}\n 
+  ${text}\n
   #\n
   # The output should be in the following JSON format (Don't put it in a code block): \n
     {
