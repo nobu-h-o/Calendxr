@@ -17,7 +17,7 @@ import {
 import { Input } from "@/app/components/ui/input";
 import { Textarea } from "@/app/components/ui/textarea";
 import { Checkbox } from "@/app/components/ui/checkbox";
-import { CalendarIcon, Trash2 } from "lucide-react";
+import { CalendarIcon, Trash2, ScanLine } from "lucide-react";
 import { Calendar } from "@/app/components/ui/calendar";
 import {
   Popover,
@@ -33,7 +33,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/app/components/ui/alert-dialog";
+
+import OCRPanel from "./OCRPanel";
 
 // Create a schema with dynamic validation for end time
 const formSchema = z.object({
@@ -71,7 +74,7 @@ interface EventFormProps {
   event?: any;
   onClose?: () => void;
   onFormSubmit?: (values: any) => void;
-  onDelete?: (calendarId: string, eventId: string) => void; // Add delete handler prop
+  onDelete?: (calendarId: string, eventId: string) => void;
   disabled?: boolean;
 }
 
@@ -85,6 +88,29 @@ const EventForm: React.FC<EventFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // OCR panel state
+  const [ocrPanelOpen, setOcrPanelOpen] = useState(false);
+  
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
   
   // Initialize form with default values or event data
   const form = useForm<z.infer<typeof formSchema>>({
@@ -105,6 +131,8 @@ const EventForm: React.FC<EventFormProps> = ({
   // Update form when event is provided (edit mode)
   useEffect(() => {
     if (event) {
+      console.log("Initializing form with event:", event);
+      
       const startDate = event.start || new Date();
       const endDate = event.end || new Date(startDate);
       
@@ -252,7 +280,7 @@ const EventForm: React.FC<EventFormProps> = ({
       
       // Send the formatted data to the parent component
       if (onFormSubmit) {
-        onFormSubmit(eventData);
+        await onFormSubmit(eventData);
       }
       
     } catch (error) {
@@ -262,23 +290,101 @@ const EventForm: React.FC<EventFormProps> = ({
     }
   };
   
+  // Fixed delete handler
   const handleDelete = async () => {
-    if (!event?.id) return;
+    // Check if event ID exists
+    if (!event?.id) {
+      console.error("Cannot delete: No event ID found");
+      setDeleteError("Cannot delete: Event ID not found");
+      return;
+    }
     
+    console.log("Starting delete operation for event:", event.id);
     setIsDeleting(true);
+    setDeleteError(null);
+    
     try {
+      // Make sure we have a valid calendarId
       const calendarId = event.calendarId || 'primary';
       
-      // Use the onDelete callback provided by the parent component
+      console.log("Deleting event:", {
+        eventId: event.id,
+        calendarId: calendarId
+      });
+      
+      // Call the onDelete callback if provided
       if (onDelete) {
-        onDelete(calendarId, event.id);
+        await onDelete(calendarId, event.id);
+        
+        // After successful delete, close the form
+        if (onClose) {
+          onClose();
+        }
+      } else {
+        console.error("Delete functionality not available: onDelete prop is missing");
+        setDeleteError("Delete functionality not available");
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting event:", error);
+      setDeleteError(`Error deleting event: ${error.message || 'Unknown error'}`);
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+  
+  // Handle showing delete confirmation dialog
+  const openDeleteConfirm = () => {
+    console.log("Opening delete confirmation dialog for event:", event?.id);
+    setShowDeleteConfirm(true);
+  };
+  
+  // Handler for event data received from OCRPanel
+  const handleEventDataExtracted = (parsedEvent: any) => {
+    console.log("Received extracted event data:", parsedEvent);
+    
+    // Only update fields if they contain data
+    if (parsedEvent.title) {
+      form.setValue('title', parsedEvent.title);
+    }
+    
+    if (parsedEvent.description) {
+      form.setValue('description', parsedEvent.description);
+    }
+    
+    if (parsedEvent.location) {
+      form.setValue('location', parsedEvent.location);
+    }
+    
+    // Handle date and time - separate fields
+    if (parsedEvent.startDate) {
+      const startDate = new Date(parsedEvent.startDate);
+      if (!isNaN(startDate.getTime())) {
+        form.setValue('startDate', startDate);
+        
+        // Set start time if available
+        if (parsedEvent.startTime) {
+          form.setValue('startTime', parsedEvent.startTime);
+        }
+      }
+    }
+    
+    if (parsedEvent.endDate) {
+      const endDate = new Date(parsedEvent.endDate);
+      if (!isNaN(endDate.getTime())) {
+        form.setValue('endDate', endDate);
+        
+        // Set end time if available
+        if (parsedEvent.endTime) {
+          form.setValue('endTime', parsedEvent.endTime);
+        }
+      }
+    }
+    
+    // Set all-day flag if specified
+    if (parsedEvent.allDay !== undefined) {
+      form.setValue('allDay', parsedEvent.allDay);
     }
   };
   
@@ -310,7 +416,7 @@ const EventForm: React.FC<EventFormProps> = ({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} disabled={disabled} />
+                  <Textarea {...field} disabled={disabled} rows={isMobile ? 3 : 4} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -352,7 +458,7 @@ const EventForm: React.FC<EventFormProps> = ({
           {/* Date and Time Row - START */}
           <div className="space-y-2">
             <div className="text-sm font-medium">Start</div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-4'}`}>
               {/* Start Date */}
               <FormField
                 control={form.control}
@@ -413,7 +519,7 @@ const EventForm: React.FC<EventFormProps> = ({
                   />
                 ) : (
                   // Empty div to maintain layout when time is hidden
-                  <div className="h-10"></div>
+                  <div className={isMobile ? "hidden" : "h-10"}></div>
                 )}
               </div>
             </div>
@@ -422,7 +528,7 @@ const EventForm: React.FC<EventFormProps> = ({
           {/* Date and Time Row - END */}
           <div className="space-y-2">
             <div className="text-sm font-medium">End</div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-4'}`}>
               {/* End Date */}
               <FormField
                 control={form.control}
@@ -485,72 +591,162 @@ const EventForm: React.FC<EventFormProps> = ({
                   />
                 ) : (
                   // Empty div to maintain layout when time is hidden
-                  <div className="h-10"></div>
+                  <div className={isMobile ? "hidden" : "h-10"}></div>
                 )}
               </div>
             </div>
           </div>
           
-          <div className="flex justify-between pt-6">
-            {/* Delete button (only shown when editing) */}
-            {event?.id && (
-              <Button 
-                type="button" 
-                variant="destructive"
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={isSubmitting || isDeleting || disabled}
-                className="flex items-center"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
+          {/* Display any delete errors */}
+          {deleteError && (
+            <div className="mt-2 p-3 bg-red-50 rounded border border-red-200">
+              <p className="text-sm text-red-700">{deleteError}</p>
+            </div>
+          )}
+          
+          <div className={`${isMobile ? 'flex flex-col space-y-3' : 'flex justify-between'} pt-6`}>
+            {/* Action buttons for mobile (stacked) */}
+            {isMobile && (
+              <>
+                {/* Primary action buttons */}
+                <div className="flex justify-between gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={onClose}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex-1"
+                  >
+                    {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
+                  </Button>
+                </div>
+                
+                {/* Secondary action buttons */}
+                <div className="flex justify-between gap-2">
+                  {/* OCR Button */}
+                  {(!event?.id) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setOcrPanelOpen(true)}
+                      disabled={isSubmitting || isDeleting || disabled}
+                      className="flex-1 flex items-center justify-center"
+                    >
+                      <ScanLine className="mr-2 h-4 w-4" />
+                      Scan Event
+                    </Button>
+                  )}
+                  
+                  {/* Delete button (only shown when editing) */}
+                  {event?.id && (
+                    <Button 
+                      type="button" 
+                      variant="destructive"
+                      onClick={openDeleteConfirm}
+                      disabled={isSubmitting || isDeleting || disabled}
+                      className="flex-1 flex items-center justify-center"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </>
             )}
             
-            {/* Empty div for spacing when there's no delete button */}
-            {!event?.id && <div></div>}
-            
-            {/* Save/Cancel buttons */}
-            <div className="flex space-x-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={onClose}
-                disabled={isSubmitting || isDeleting || disabled}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting || isDeleting || disabled}
-              >
-                {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
-              </Button>
-            </div>
+            {/* Desktop layout */}
+            {!isMobile && (
+              <>
+                {/* Delete/OCR button (left side) */}
+                {event?.id ? (
+                  <Button 
+                    type="button" 
+                    variant="destructive"
+                    onClick={openDeleteConfirm}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex items-center"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOcrPanelOpen(true)}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex items-center"
+                  >
+                    <ScanLine className="mr-2 h-4 w-4" />
+                    Scan Event
+                  </Button>
+                )}
+                
+                {/* Save/Cancel buttons (right side) */}
+                <div className="flex space-x-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={onClose}
+                    disabled={isSubmitting || isDeleting || disabled}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting || isDeleting || disabled}
+                  >
+                    {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </form>
       </Form>
       
       {/* Delete confirmation dialog */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Event</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this event? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete} 
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {showDeleteConfirm && (
+        <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <AlertDialogContent className={isMobile ? "w-[90vw] max-w-[90vw]" : ""}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Event</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this event? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className={isMobile ? "flex-col-reverse space-y-2 space-y-reverse" : ""}>
+              <AlertDialogCancel 
+                disabled={isDeleting}
+                className={isMobile ? "w-full" : ""}
+              >
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className={`bg-destructive text-destructive-foreground hover:bg-destructive/90 ${isMobile ? "w-full" : ""}`}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+      
+      {/* OCR Panel Component */}
+      <OCRPanel
+        isOpen={ocrPanelOpen}
+        onClose={() => setOcrPanelOpen(false)}
+        onEventDataExtracted={handleEventDataExtracted}
+      />
     </>
   );
 };

@@ -26,6 +26,7 @@ export async function GET() {
     const res = await calendar.events.list({
       calendarId: "primary",
       timeMin: new Date('2025-01-01T00:00:00Z').toISOString(), // Fetch events from the year 2025 onwards
+      timeMax: new Date('2027-01-01T00:00:00Z').toISOString(), // Until the year 2026
       maxResults: 1000,
       singleEvents: true,
       orderBy: "startTime",
@@ -34,6 +35,7 @@ export async function GET() {
     const events = ((res.data.items as any[]) || []).map((item: any) => ({
       id: item.id,
       title: item.summary || "No Title",
+      description: item.description || "",
       start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
     }));

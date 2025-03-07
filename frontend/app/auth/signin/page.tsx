@@ -42,8 +42,8 @@ export default function SignInPage() {
         <div className="space-y-6">
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 
-              text-gray-700 bg-white rounded-3xl border border-gray-300 
+            className="w-full flex items-center justify-center gap-2 px-4 py-2
+              text-gray-700 bg-white rounded-3xl border border-gray-300
               hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
           >
             <Image src={googleLogo} alt="Google logo" width={30} height={30} />
