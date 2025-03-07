@@ -431,20 +431,6 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
               />
             </div>
           )}
-          
-          {/* Camera capture for mobile devices */}
-          {isMobile && !isProcessingOcr && (
-            <div className="mt-4">
-              <p className="text-xs text-gray-500 mb-2">Or take a photo:</p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                capture="environment"
-                onChange={handleImageChange} 
-                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
