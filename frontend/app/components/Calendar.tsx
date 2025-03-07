@@ -523,7 +523,7 @@ const Calendar: React.FC = () => {
       }
       
       await updateCalendarEvent(calendarId, eventId, updateData);
-      await fetchEvents(); // Refresh events after update
+      // await fetchEvents(); // Refresh events after update
     } catch (error) {
       console.error("Error updating event:", error);
       setError("Failed to update event. Please check on Google Calendar.");
