@@ -364,3 +364,12 @@ async def ocr_image(image: UploadFile = File(...)):
     result_text = texts[0].description if texts else "No text found"
 
     return {"text": result_text}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "FastAPI is running"}
+
+@app.get("/test-json")
+def test_json():
+    return {"message": "This is a test JSON response", "status": "success"}
