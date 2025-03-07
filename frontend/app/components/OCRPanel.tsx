@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { X } from "lucide-react";
@@ -53,11 +53,38 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const [parsedEventData, setParsedEventData] = useState<EventDataApiResponse | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Check viewport size for mobile optimizations
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setImage(file);
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
       // Reset previous states when a new image is selected
       setExtractedText(null);
       setAiResponse(null);
@@ -268,13 +295,13 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
       style={preventOverflowStyle}
     >
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[400px] max-w-full bg-white shadow-xl overflow-y-auto overflow-x-hidden z-50 transition-transform duration-300 ease-in-out transform ${
+        className={`fixed right-0 top-0 bottom-0 ${isMobile ? 'w-full' : 'w-[400px]'} max-w-full bg-white shadow-xl overflow-y-auto overflow-x-hidden z-50 transition-transform duration-300 ease-in-out transform ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
         style={preventOverflowStyle}
       >
-        <div className="p-6" style={preventOverflowStyle}>
+        <div className={`p-${isMobile ? '4' : '6'}`} style={preventOverflowStyle}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Scan Event Details</h2>
             <Button
@@ -292,12 +319,39 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
               <p className="text-sm text-gray-600 mb-2">
                 Upload an image of your event invitation, flyer, or details to automatically fill in the form.
               </p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange} 
-                className="mb-2 cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
-              />
+              
+              {/* Image preview */}
+              {imagePreview && (
+                <div className="mb-3 relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full rounded-md border border-gray-200 object-contain max-h-48"
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="destructive"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => {
+                      setImage(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+              
+              {!imagePreview && (
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  className="mb-2 cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+                />
+              )}
+              
               <Button
                 type="submit"
                 className="w-full"
@@ -322,25 +376,25 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 <div className="grid gap-2">
                   <div>
                     <span className="text-xs font-medium">Title:</span>
-                    <p className="text-sm">{parsedEventData.title}</p>
+                    <p className="text-sm break-words">{parsedEventData.title}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Description:</span>
-                    <p className="text-sm">{parsedEventData.description}</p>
+                    <p className="text-sm break-words">{parsedEventData.description}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Location:</span>
-                    <p className="text-sm">{parsedEventData.location}</p>
+                    <p className="text-sm break-words">{parsedEventData.location}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Start:</span>
-                    <p className="text-sm">{new Date(parsedEventData.start).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{parsedEventData.start}</p>
+                    <p className="text-sm break-words">{new Date(parsedEventData.start).toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 break-words">{parsedEventData.start}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">End:</span>
-                    <p className="text-sm">{new Date(parsedEventData.end).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{parsedEventData.end}</p>
+                    <p className="text-sm break-words">{new Date(parsedEventData.end).toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 break-words">{parsedEventData.end}</p>
                   </div>
                 </div>
               </div>
@@ -362,6 +416,33 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                   {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
                 </pre>
               </div>
+            </div>
+          )}
+          
+          {/* Image upload area when a preview exists */}
+          {imagePreview && (
+            <div className="mt-4">
+              <p className="text-xs text-gray-500 mb-2">Choose a different image:</p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageChange} 
+                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+              />
+            </div>
+          )}
+          
+          {/* Camera capture for mobile devices */}
+          {isMobile && !isProcessingOcr && (
+            <div className="mt-4">
+              <p className="text-xs text-gray-500 mb-2">Or take a photo:</p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                capture="environment"
+                onChange={handleImageChange} 
+                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+              />
             </div>
           )}
         </div>
