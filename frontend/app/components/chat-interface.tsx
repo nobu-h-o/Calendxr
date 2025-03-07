@@ -9,15 +9,57 @@ import { ScrollArea } from "@/app/components/ui/scroll-area"
 import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai"
+import { useSession } from "next-auth/react";
+
 
 export function ChatInterface() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<UIMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [conversationID, setConversationID] = useState("");
+  //const [calendarEvents, setCalendarEvents] = useState<{ title: string; start: Date; end: Date }[]>([]);
+  const { data: session } = useSession();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const api_url = "http://localhost:3000";
+
+  useEffect(() => {
+      if (session?.user) {
+        const { email, name } = session.user;
+        if (!email) {
+          console.error("Email not found.");
+          return;
+        }
   
+        (async () => {
+          try {
+            const res = await fetch(`${api_url}/api/calendar/get`);
+            const calendarData = await res.json();
+            
+            const filteredData = calendarData.map(({ id, title, start, end }: { id: string; title: string; start: string; end: string }) => ({
+              id,
+              title,
+              start : new Date(start),
+              end: new Date(end),
+            }));
+            console.log("Data loaded");
+
+            const saveRes = await fetch(`${api_url}/api/user`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, email, events: filteredData }),
+            });
+
+            if (!saveRes.ok) {
+              throw new Error("Failed to save user and events.");
+            }
+
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
+        })();
+      }
+    }, [session]);
+
   useEffect(() => {
     const fetchAndStoreCalendarData = async () => {
 
@@ -44,7 +86,8 @@ export function ChatInterface() {
           start : new Date(start),
           end: new Date(end),
         }));
-  
+
+        //setCalendarEvents(filteredData);
         // If data has changed, update the dataset
         await createDocumentByText(datasetId, {
           title: "Calendar Events",
