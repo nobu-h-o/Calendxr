@@ -29,7 +29,7 @@ export async function getChatGPTResponse(text: string): Promise<string> {
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "system", content: prompt }],
-      max_tokens: 100,
+      max_tokens: 200,
     });
 
     return (
