@@ -201,12 +201,21 @@ Calendxrは現代的なWebアプリケーションアーキテクチャに従っ
 
 ## 👨‍💻 開発チーム
 
+<<<<<<< HEAD
 - **Miu Nicole Takagi** - *プロジェクトマネージャー* - [GitHub](https://github.com/mint-talltree)
 - **Nobuhiro Oto** - *フルスタック* - [GitHub](https://github.com/nobu-h-o)
 - **Ryota Tetsuka** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
 - **Jihun Park** - *バックエンド* - [GitHub](https://github.com/JihunPark03)
 - **Atomu Naka** - *バックエンド* - [GitHub](https://github.com/Cardioid22)
 - **Misaki Hara** - *バックエンド＆インフラ* - [GitHub](https://github.com/gostachan)
+=======
+- **高木美羽ニコル** - *プロジェクトマネージャー* - [GitHub](https://github.com/mint-talltree)
+- **太田信浩** - *フルスタック* - [GitHub](https://github.com/nobu-h-o)
+- **手塚瞭太** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
+- **パク・ジフン** - *バックエンド* - [GitHub](https://github.com/JihunPark03)
+- **中晃夢** - *バックエンド* - [GitHub](https://github.com/Cardioid22)
+- **原美咲** - *バックエンド＆インフラ* - [GitHub](https://github.com/gostachan)
+>>>>>>> 305988b (update readme)
 
 ## 🙏 謝辞
 

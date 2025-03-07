@@ -89,9 +89,28 @@ const EventForm: React.FC<EventFormProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   
   // OCR panel state
   const [ocrPanelOpen, setOcrPanelOpen] = useState(false);
+  
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
   
   // Initialize form with default values or event data
   const form = useForm<z.infer<typeof formSchema>>({
@@ -397,7 +416,7 @@ const EventForm: React.FC<EventFormProps> = ({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} disabled={disabled} />
+                  <Textarea {...field} disabled={disabled} rows={isMobile ? 3 : 4} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -439,7 +458,7 @@ const EventForm: React.FC<EventFormProps> = ({
           {/* Date and Time Row - START */}
           <div className="space-y-2">
             <div className="text-sm font-medium">Start</div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-4'}`}>
               {/* Start Date */}
               <FormField
                 control={form.control}
@@ -500,7 +519,7 @@ const EventForm: React.FC<EventFormProps> = ({
                   />
                 ) : (
                   // Empty div to maintain layout when time is hidden
-                  <div className="h-10"></div>
+                  <div className={isMobile ? "hidden" : "h-10"}></div>
                 )}
               </div>
             </div>
@@ -509,7 +528,7 @@ const EventForm: React.FC<EventFormProps> = ({
           {/* Date and Time Row - END */}
           <div className="space-y-2">
             <div className="text-sm font-medium">End</div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 gap-4'}`}>
               {/* End Date */}
               <FormField
                 control={form.control}
@@ -572,7 +591,7 @@ const EventForm: React.FC<EventFormProps> = ({
                   />
                 ) : (
                   // Empty div to maintain layout when time is hidden
-                  <div className="h-10"></div>
+                  <div className={isMobile ? "hidden" : "h-10"}></div>
                 )}
               </div>
             </div>
@@ -585,51 +604,110 @@ const EventForm: React.FC<EventFormProps> = ({
             </div>
           )}
           
-          <div className="flex justify-between pt-6">
-            {/* Delete button (only shown when editing) */}
-            {event?.id && (
-              <Button 
-                type="button" 
-                variant="destructive"
-                onClick={openDeleteConfirm}
-                disabled={isSubmitting || isDeleting || disabled}
-                className="flex items-center"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
-            )}
-            {/* OCR Button */}
-            {(!event?.id) && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOcrPanelOpen(true)}
-                disabled={isSubmitting || isDeleting || disabled}
-                className="flex items-center"
-              >
-                <ScanLine className="mr-2 h-4 w-4" />
-                Scan Event
-              </Button>
+          <div className={`${isMobile ? 'flex flex-col space-y-3' : 'flex justify-between'} pt-6`}>
+            {/* Action buttons for mobile (stacked) */}
+            {isMobile && (
+              <>
+                {/* Primary action buttons */}
+                <div className="flex justify-between gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={onClose}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex-1"
+                  >
+                    {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
+                  </Button>
+                </div>
+                
+                {/* Secondary action buttons */}
+                <div className="flex justify-between gap-2">
+                  {/* OCR Button */}
+                  {(!event?.id) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setOcrPanelOpen(true)}
+                      disabled={isSubmitting || isDeleting || disabled}
+                      className="flex-1 flex items-center justify-center"
+                    >
+                      <ScanLine className="mr-2 h-4 w-4" />
+                      Scan Event
+                    </Button>
+                  )}
+                  
+                  {/* Delete button (only shown when editing) */}
+                  {event?.id && (
+                    <Button 
+                      type="button" 
+                      variant="destructive"
+                      onClick={openDeleteConfirm}
+                      disabled={isSubmitting || isDeleting || disabled}
+                      className="flex-1 flex items-center justify-center"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </>
             )}
             
-            {/* Save/Cancel buttons */}
-            <div className="flex space-x-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={onClose}
-                disabled={isSubmitting || isDeleting || disabled}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting || isDeleting || disabled}
-              >
-                {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
-              </Button>
-            </div>
+            {/* Desktop layout */}
+            {!isMobile && (
+              <>
+                {/* Delete/OCR button (left side) */}
+                {event?.id ? (
+                  <Button 
+                    type="button" 
+                    variant="destructive"
+                    onClick={openDeleteConfirm}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex items-center"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOcrPanelOpen(true)}
+                    disabled={isSubmitting || isDeleting || disabled}
+                    className="flex items-center"
+                  >
+                    <ScanLine className="mr-2 h-4 w-4" />
+                    Scan Event
+                  </Button>
+                )}
+                
+                {/* Save/Cancel buttons (right side) */}
+                <div className="flex space-x-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={onClose}
+                    disabled={isSubmitting || isDeleting || disabled}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting || isDeleting || disabled}
+                  >
+                    {isSubmitting ? "Saving..." : event?.id ? "Update" : "Create"}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </form>
       </Form>
@@ -637,19 +715,24 @@ const EventForm: React.FC<EventFormProps> = ({
       {/* Delete confirmation dialog */}
       {showDeleteConfirm && (
         <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-          <AlertDialogContent>
+          <AlertDialogContent className={isMobile ? "w-[90vw] max-w-[90vw]" : ""}>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Event</AlertDialogTitle>
               <AlertDialogDescription>
                 Are you sure you want to delete this event? This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogFooter className={isMobile ? "flex-col-reverse space-y-2 space-y-reverse" : ""}>
+              <AlertDialogCancel 
+                disabled={isDeleting}
+                className={isMobile ? "w-full" : ""}
+              >
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className={`bg-destructive text-destructive-foreground hover:bg-destructive/90 ${isMobile ? "w-full" : ""}`}
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </AlertDialogAction>
