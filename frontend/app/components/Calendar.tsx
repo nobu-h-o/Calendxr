@@ -419,7 +419,12 @@ const Calendar: React.FC = () => {
   return (
     <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
-      <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
+      <div className="flex-1 rounded-lg shadow-sm overflow-hidden calendar-container" style={{
+        ...preventOverflowStyle,
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+        borderColor: "hsl(var(--border))"
+      }}>
       <FullCalendar
         ref={calendarRef}
         plugins={[

@@ -1,0 +1,380 @@
+/* Same content as the themes.css file we created earlier */
+/* Default light theme - already defined in globals.css, but we repeat key colors for reference */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222.2 84% 4.9%;
+  --sidebar-border: 214.3 31.8% 91.4%;
+  --sidebar-accent: 210 40% 96.1%;
+  --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+  --sidebar-ring: 222.2 84% 4.9%;
+
+  /* Calendar-specific light theme colors */
+  --fc-event-bg-color: #ffffff;
+  --fc-event-border-color: #000000;
+  --fc-event-text-color: #000000;
+  --fc-page-bg-color: #ffffff;
+  --fc-border-color: transparent;
+  --fc-highlight-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Colorful theme */
+.colorful {
+  --background: 230 100% 98%;
+  --foreground: 222 47% 11%;
+  --card: 180 75% 95%;
+  --card-foreground: 222 47% 11%;
+  --popover: 180 75% 95%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 199 89% 48%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 340 82% 52%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 270 76% 85%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 262 83% 58%;
+  --sidebar: 230 100% 98%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-border: 270 76% 85%;
+  --sidebar-accent: 262 83% 58%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-ring: 262 83% 58%;
+
+  /* Calendar-specific colorful theme colors */
+  --fc-button-bg-color: #6a42f4;
+  --fc-button-border-color: #6a42f4;
+  --fc-button-hover-bg-color: #5835d9;
+  --fc-button-hover-border-color: #5835d9;
+  --fc-event-bg-color: #fd3a69;
+  --fc-event-border-color: #fd3a69;
+  --fc-event-text-color: #ffffff;
+  --fc-page-bg-color: #f0faff;
+  --fc-border-color: #c4b1ff;
+  --fc-highlight-color: rgba(106, 66, 244, 0.15);
+  --fc-today-bg-color: rgba(106, 66, 244, 0.07);
+  --fc-neutral-bg-color: #eef5ff;
+}
+
+/* Adjust calendar styles for dark and colorful themes */
+.dark .fc .fc-daygrid-day-top {
+  color: #fff;
+}
+
+.dark .fc .fc-col-header-cell {
+  color: #fff;
+  background-color: #222;
+}
+
+.dark .fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .fc-daygrid-block-event {
+  background-color: #2d2d2d !important;
+  border-color: #ffffff !important;
+}
+
+.dark .fc-timegrid-event, 
+.dark .fc-daygrid-dot-event, 
+.dark .fc-daygrid-event:not(.fc-daygrid-block-event) {
+  background-color: #2d2d2d !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.colorful .fc-daygrid-block-event {
+  background-color: #fd3a69 !important;
+  border-color: #fd3a69 !important;
+}
+
+.colorful .fc-timegrid-event, 
+.colorful .fc-daygrid-dot-event, 
+.colorful .fc-daygrid-event:not(.fc-daygrid-block-event) {
+  background-color: #29b9ff !important;
+  border-color: #29b9ff !important;
+  color: #ffffff !important;
+}
+
+/* Update calendar icons and button styling for different themes */
+.dark .fc .fc-button-primary {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.dark .fc .fc-button-primary:hover {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0;
+  color: #000000;
+}
+
+.colorful .fc .fc-button-primary {
+  background-color: #6a42f4;
+  color: #ffffff;
+  border-color: #6a42f4;
+}
+
+.colorful .fc .fc-button-primary:hover {
+  background-color: #5835d9;
+  border-color: #5835d9;
+}
+
+/* Fix text colors for calendar events in different themes */
+.dark .fc-daygrid-block-event .fc-event-title, 
+.dark .fc-daygrid-block-event .fc-event-time {
+  color: #ffffff !important;
+}
+
+.dark .fc-timegrid-event .fc-event-title,
+.dark .fc-timegrid-event .fc-event-time,
+.dark .fc-daygrid-dot-event .fc-event-title,
+.dark .fc-daygrid-dot-event .fc-event-time {
+  color: #ffffff !important;
+}
+
+.colorful .fc-daygrid-block-event .fc-event-title, 
+.colorful .fc-daygrid-block-event .fc-event-time {
+  color: #ffffff !important;
+}
+
+.colorful .fc-timegrid-event .fc-event-title,
+.colorful .fc-timegrid-event .fc-event-time,
+.colorful .fc-daygrid-dot-event .fc-event-title,
+.colorful .fc-daygrid-dot-event .fc-event-time {
+  color: #ffffff !important;
+}
+
+/* Theme-specific adjustments for the event form panel */
+.dark .event-form-panel {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.colorful .event-form-panel {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Ensure chat interface adapts to theme */
+.dark .chat-interface {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+.colorful .chat-interface {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+/* Themed sign out button */
+.dark .sign-out-button {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.colorful .sign-out-button {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+/* Add transition to theme changes */
+*, 
+*::before, 
+*::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Additional colorful theme enhancements */
+.colorful .fc-col-header-cell {
+  background-color: #f0f5ff;
+  font-weight: 600;
+  color: #6a42f4;
+}
+
+.colorful .fc-day-today {
+  background-color: rgba(106, 66, 244, 0.07) !important;
+  border: 1px dashed #6a42f4 !important;
+}
+
+.colorful .fc-toolbar-title {
+  color: #6a42f4;
+  font-weight: 700;
+}
+
+.colorful .fc-daygrid-day-number {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Custom styles for the theme switcher */
+.colorful .theme-switcher .dropdown-menu-trigger {
+  color: #6a42f4;
+  border-color: #d4c2ff;
+  background-color: rgba(106, 66, 244, 0.05);
+}
+
+.theme-switcher svg {
+  transition: transform 0.3s ease;
+}
+
+.theme-switcher button:hover svg {
+  transform: rotate(30deg) scale(1.1);
+}
+
+/* Fix contrast issues on themed chat interface */
+.dark .card {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+}
+
+.colorful .card {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+}
+
+/* Ensure proper styling for the OCR panel and event forms with different themes */
+.dark .fixed.inset-0.bg-black\/30 {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.colorful .fixed.inset-0.bg-black\/30 {
+  background-color: rgba(106, 66, 244, 0.3);
+}
+
+/* Calendar main background overrides */
+.dark .fc {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground));
+}
+
+.dark .fc .fc-scrollgrid {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .fc .fc-view-harness-active {
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark .fc .fc-view {
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark .fc-daygrid-day-frame {
+  background-color: hsl(var(--background)) !important;
+}
+
+.colorful .fc {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground));
+}
+
+.colorful .fc .fc-scrollgrid {
+  border-color: hsl(var(--border)) !important;
+}
+
+.colorful .fc .fc-view-harness-active {
+  background-color: hsl(var(--background)) !important;
+}
+
+.colorful .fc .fc-view {
+  background-color: hsl(var(--background)) !important;
+}
+
+.colorful .fc-daygrid-day-frame {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Ensure the outer calendar container background matches the theme */
+.dark .bg-white.rounded-lg,
+.dark .flex-1.bg-white {
+  background-color: hsl(var(--background)) !important;
+}
+
+.colorful .bg-white.rounded-lg,
+.colorful .flex-1.bg-white {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Theme application logo */
+.colorful .site-logo {
+  background: linear-gradient(45deg, #6a42f4, #fd3a69);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+.dark .site-logo {
+  color: #fff;
+}
+
+/* Force calendar days background to match theme */
+.dark .fc td.fc-day {
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark .fc th.fc-day {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.colorful .fc td.fc-day {
+  background-color: hsl(var(--background)) !important;
+}
+
+.colorful .fc th.fc-day {
+  background-color: hsl(var(--accent)) !important;
+}
+
+/* Calendar specific theme fixes */
+.dark .fc .fc-toolbar.fc-header-toolbar {
+  background-color: hsl(var(--background));
+}
+
+.colorful .fc .fc-toolbar.fc-header-toolbar {
+  background-color: hsl(var(--background));
+}
+
+/* Event form side panel theme fixes */
+.dark .fixed.right-0.top-0.bottom-0.z-40.bg-white {
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.colorful .fixed.right-0.top-0.bottom-0.z-40.bg-white {
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Calendar today button fix */
+.dark button.fc-today-button,
+.colorful button.fc-today-button {
+  opacity: 1 !important;
+}
