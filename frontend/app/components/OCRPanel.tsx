@@ -285,19 +285,6 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
   const handleClosePanel = () => {
     onClose();
   };
-  
-  // Scroll to top when panel opens
-  useEffect(() => {
-    if (isOpen) {
-      // Use setTimeout to ensure the panel is rendered before scrolling
-      setTimeout(() => {
-        const panel = document.querySelector('.ocr-panel-content');
-        if (panel) {
-          panel.scrollTop = 0;
-        }
-      }, 100);
-    }
-  }, [isOpen]);
 
   return (
     <div 
@@ -314,7 +301,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
         onClick={(e) => e.stopPropagation()}
         style={preventOverflowStyle}
       >
-        <div className={`p-${isMobile ? '4' : '6'} ocr-panel-content`} style={preventOverflowStyle}>
+        <div className={`p-${isMobile ? '4' : '6'}`} style={preventOverflowStyle}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Scan Event Details</h2>
             <Button
@@ -357,30 +344,17 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
               )}
               
               {!imagePreview && (
-                <>
-                  <div className="flex flex-col gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="relative w-full h-12 overflow-hidden"
-                      onClick={() => {
-                        const fileInput = document.createElement('input');
-                        fileInput.type = 'file';
-                        fileInput.accept = 'image/*';
-                        fileInput.capture = 'environment';
-                        fileInput.onchange = (e) => handleImageChange(e as any);
-                        fileInput.click();
-                      }}
-                    >
-                      Choose or Take Photo
-                    </Button>
-                  </div>
-                </>
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  className="mb-2 cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+                />
               )}
               
               <Button
                 type="submit"
-                className="w-full mt-3"
+                className="w-full"
                 disabled={!image || isProcessingOcr}
               >
                 {isProcessingOcr ? "Processing..." : "Scan Image"}
@@ -449,21 +423,26 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
           {imagePreview && (
             <div className="mt-4">
               <p className="text-xs text-gray-500 mb-2">Choose a different image:</p>
-              <Button
-                type="button"
-                variant="outline"
-                className="relative w-full"
-                onClick={() => {
-                  const fileInput = document.createElement('input');
-                  fileInput.type = 'file';
-                  fileInput.accept = 'image/*';
-                  fileInput.capture = 'environment';
-                  fileInput.onchange = (e) => handleImageChange(e as any);
-                  fileInput.click();
-                }}
-              >
-                Choose or Take Photo
-              </Button>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageChange} 
+                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+              />
+            </div>
+          )}
+          
+          {/* Camera capture for mobile devices */}
+          {isMobile && !isProcessingOcr && (
+            <div className="mt-4">
+              <p className="text-xs text-gray-500 mb-2">Or take a photo:</p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                capture="environment"
+                onChange={handleImageChange} 
+                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
+              />
             </div>
           )}
         </div>
