@@ -9,7 +9,6 @@ import { useState, useEffect, useRef } from "react"
 import { UIMessage } from "ai"
 import { useSession } from "next-auth/react";
 
-
 export function ChatInterface() {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<UIMessage[]>([])
@@ -17,49 +16,61 @@ export function ChatInterface() {
   const [conversationID, setConversationID] = useState("")
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-
+  // Initial load of user data - runs only once when session is available
   useEffect(() => {
-    if (session?.user) {
-      const { email, name } = session.user;
-      if (!email) {
-        console.error("Email not found.");
-        return;
+    if (session?.user && !initialLoadComplete) {
+      loadUserData();
+      setInitialLoadComplete(true);
+    }
+  }, [session, initialLoadComplete]);
+
+  // Function to load user data and calendar events
+  const loadUserData = async () => {
+    if (!session?.user?.email) {
+      console.error("Email not found.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/calendar/get`);
+      const calendarData = await res.json();
+      
+      const filteredData = calendarData.map(({ id, title, start, end }: { id: string; title: string; start: string; end: string }) => ({
+        id,
+        title,
+        start: new Date(start),
+        end: new Date(end),
+      }));
+      console.log("Data loaded");
+
+      await saveUserData(filteredData);
+      console.log("Data loaded successfully");
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  // Function to save user data
+  const saveUserData = async (events: any[]) => {
+    if (!session?.user?.email || !session?.user?.name) return;
+    
+    const { email, name } = session.user;
+    try {
+      const saveRes = await fetch(`/api/user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, events }),
+      });
+
+      if (!saveRes.ok) {
+        throw new Error("Failed to save user and events.");
       }
-
-      (async () => {
-        try {
-          const res = await fetch(`/api/calendar/get`);
-          const calendarData = await res.json();
-          
-          const filteredData = calendarData.map(({ id, title, start, end }: { id: string; title: string; start: string; end: string }) => ({
-            id,
-            title,
-            start : new Date(start),
-            end: new Date(end),
-          }));
-          console.log("Data loaded");
-
-          const saveRes = await fetch(`/api/user`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, events: filteredData }),
-          });
-
-          console.log("Data loaded successfully");
-          if (!saveRes.ok) {
-            throw new Error("Failed to save user and events.");
-          }
-
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      })();
+    } catch (error) {
+      console.error("Error saving user data:", error);
     }
-    else {
-      console.error("Session not found.");
-    }
-  }, [session]);
+  };
 
   // Auto-scroll when messages update
   useEffect(() => {
@@ -69,7 +80,29 @@ export function ChatInterface() {
         scrollContainer.scrollTop = scrollContainer.scrollHeight
       }
     }
-  }, [messages])
+  }, [messages]);
+
+  // Function to update data after new event is added
+  const updateAfterEventChange = async () => {
+    if (session?.user) {
+      await loadUserData();
+    }
+  };
+
+  // Make this function available globally
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.updateCalendarData = updateAfterEventChange;
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        // @ts-ignore
+        delete window.updateCalendarData;
+      }
+    };
+  }, [session]);
 
   // Directly call the API route (/api/chatbot) on form submission
   const handleSendMessages = async (e: React.FormEvent<HTMLFormElement>) => {
