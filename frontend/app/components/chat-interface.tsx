@@ -32,6 +32,7 @@ export function ChatInterface() {
   
         (async () => {
           try {
+            console.log("Data loaded good 1");
             const res = await fetch(`${api_url}/api/calendar/get`);
             const calendarData = await res.json();
             
@@ -58,51 +59,68 @@ export function ChatInterface() {
           }
         })();
       }
+      else {
+        console.error("Session not found.");
+      }
     }, [session]);
 
   useEffect(() => {
     const fetchAndStoreCalendarData = async () => {
+      if (session?.user) {
+        const { email } = session.user;
+        if (!email) {
+          console.error("Email not found.");
+          return;
+        }
+        console.log("Data loaded good 2");
+        const dataset = await getKnowledgeBase();
+        if (!dataset) {
+          console.error("Error fetching dataset:", dataset);
+          return;
+        }
+        const datasetId = dataset.data[dataset.data.length - 1]?.id;
+        const documents = await getDocumentList(datasetId);
+        
+        documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
 
-      const dataset = await getKnowledgeBase();
-      if (!dataset) {
-        console.error("Error fetching dataset:", dataset);
-        return;
+        try {
+          console.log("Dataset ID:", datasetId);
+
+          const response = await fetch(`${api_url}/api/user?email=${email}`);
+          if (!response.ok) throw new Error("Failed to fetch user calendar data");
+          
+          const calendarData = await response.json();
+
+          console.log("Calendar data:", calendarData);
+
+          const events = calendarData.events || [];
+
+          const filteredData = events.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
+            title,
+            start : new Date(start),
+            end: new Date(end),
+          }));
+
+          //setCalendarEvents(filteredData);
+          // If data has changed, update the dataset
+          await createDocumentByText(datasetId, {
+            title: "Calendar Events",
+            content: JSON.stringify(filteredData),
+          });
+    
+          console.log("Calendar data updated successfully.");
+        } catch (error) {
+          console.error("Error fetching and storing calendar data:", error);
+        }
       }
-      const datasetId = dataset.data[dataset.data.length - 1]?.id;
-      const documents = await getDocumentList(datasetId);
-      
-      documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
-
-      try {
-        console.log("Dataset ID:", datasetId);
-
-        const response = await fetch(`${api_url}/api/calendar/get`);
-        console.log("Response:", response);
-        if (!response.ok) throw new Error("Failed to fetch calendar data");
-        const calendarData = await response.json();
-
-        const filteredData = calendarData.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
-          title,
-          start : new Date(start),
-          end: new Date(end),
-        }));
-
-        //setCalendarEvents(filteredData);
-        // If data has changed, update the dataset
-        await createDocumentByText(datasetId, {
-          title: "Calendar Events",
-          content: JSON.stringify(filteredData),
-        });
-  
-        console.log("Calendar data updated successfully.");
-      } catch (error) {
-        console.error("Error fetching and storing calendar data:", error);
+      else {
+        console.error("Session not found.");
       }
     };
     // Run immediately on page load
     fetchAndStoreCalendarData();
     
-  }, [conversationID]);
+  }, [session]);
   
 
   // Load existing messages when conversation ID changes

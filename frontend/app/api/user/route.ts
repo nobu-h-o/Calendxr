@@ -35,3 +35,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    // Extract email from query params
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json({ message: "Email is required" }, { status: 400 });
+    }
+
+    // Fetch user with events
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { events: true }, // Include the associated events
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(user, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
