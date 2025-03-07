@@ -5,148 +5,77 @@ import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
-import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
-import { useState, useEffect, useRef } from "react";
-import { UIMessage } from "ai";
-
-const PORT = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import { useState, useEffect, useRef } from "react"
+import { UIMessage } from "ai"
 
 export function ChatInterface() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [conversationID, setConversationID] = useState("");
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const fetchAndStoreCalendarData = async () => {
+  const [message, setMessage] = useState("")
+  const [messages, setMessages] = useState<UIMessage[]>([])
+  const [loading, setLoading] = useState(false)
+  const [conversationID, setConversationID] = useState("")
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-      const dataset = await getKnowledgeBase();
-      if (!dataset) {
-        console.error("Error fetching dataset:", dataset);
-        return;
-      }
-      const datasetId = dataset.data[dataset.data.length - 1]?.id;
-      const documents = await getDocumentList(datasetId);
-      
-      documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
-
-      try {
-        console.log("Dataset ID:", datasetId);
-
-        const response = await fetch(`${PORT}/api/calendar/get`);
-        console.log("Response:", response);
-        if (!response.ok) throw new Error("Failed to fetch calendar data");
-        const calendarData = await response.json();
-
-        const filteredData = calendarData.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
-          title,
-          start : new Date(start),
-          end: new Date(end),
-        }));
-  
-        // If data has changed, update the dataset
-        await createDocumentByText(datasetId, {
-          title: "Calendar Events",
-          content: JSON.stringify(filteredData),
-        });
-  
-        console.log("Calendar data updated successfully.");
-      } catch (error) {
-        console.error("Error fetching and storing calendar data:", error);
-      }
-    };
-    // Run immediately on page load
-    fetchAndStoreCalendarData();
-    
-  }, [conversationID]);
-  
-
-  // Load existing messages when conversation ID changes
-  useEffect(() => {
-    const loadMessages = async () => {
-      if (conversationID) {
-        try {
-          setLoading(true);
-          const response = await getMessages(conversationID);
-          
-          if (response && Array.isArray(response.messages)) {
-            const formattedMessages = response.messages.map((msg: any) => ({
-              id: msg.id || Date.now().toString(),
-              role: msg.role || (msg.is_user ? "user" : "assistant"),
-              content: msg.content || msg.text || "",
-              parts: [{ type: "text", text: msg.content || msg.text || "" }],
-            }));
-            
-            setMessages(formattedMessages);
-          }
-        } catch (error) {
-          console.error("Error loading messages:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadMessages();
-  }, [conversationID]);
-
-  // Scroll to bottom when messages change
+  // Auto-scroll when messages update
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
       if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        scrollContainer.scrollTop = scrollContainer.scrollHeight
       }
     }
-  }, [messages]);
+  }, [messages])
 
+  // Directly call the API route (/api/chatbot) on form submission
   const handleSendMessages = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    
-    setLoading(true);
-    console.log("Current conversationID:", conversationID);
-    
-    // Add user message immediately for better UX
-    const userMessage: UIMessage = {
+    e.preventDefault()
+    if (!message.trim()) return
+    setLoading(true)
+
+    // Add user's message immediately for better UX
+    const userMsg: UIMessage = {
       id: Date.now().toString(),
       role: "user",
       content: message,
-      parts: [{ type: "text", text: message }],
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    const currentMessage = message;
-    setMessage("");
-    
+      parts: [{ type: "text", text: message }]
+    }
+    setMessages(prev => [...prev, userMsg])
+    const currentMessage = message
+    setMessage("")
+
     try {
-      const response = await sendChatMessage(currentMessage, conversationID);
-      setConversationID(response.conversation_id);
-      
-      const assistantMessage: UIMessage = {
+      const payload = {
+        message: currentMessage,
+        conversationId: conversationID || undefined
+      }
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      const data = await response.json()
+      setConversationID(data.conversation_id)
+      const assistantMsg: UIMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response.answer || "No response",
-        parts: [{ type: "text", text: response.answer || "No response" }],
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
+        content: data.answer || "No response",
+        parts: [{ type: "text", text: data.answer || "No response" }]
+      }
+      setMessages(prev => [...prev, assistantMsg])
     } catch (error) {
-      console.error("Error sending message:", error);
-      // Add error message
-      const errorMessage: UIMessage = {
+      console.error("Error sending message:", error)
+      const errorMsg: UIMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: "Sorry, there was an error processing your request.",
-        parts: [{ type: "text", text: "Sorry, there was an error processing your request." }],
-      };
-      
-      setMessages(prev => [...prev, errorMessage]);
+        parts: [{ type: "text", text: "Sorry, there was an error processing your request." }]
+      }
+      setMessages(prev => [...prev, errorMsg])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Card className="col-span-1 flex flex-col h-[calc(100vh-120px)]">
@@ -167,14 +96,12 @@ export function ChatInterface() {
             </div>
           ) : (
             <div className="space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`rounded-lg px-3 py-2 max-w-[80%] ${
-                      message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                    }`}
-                  >
-                    {message.content}
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`rounded-lg px-3 py-2 max-w-[80%] ${
+                    msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  }`}>
+                    {msg.content}
                   </div>
                 </div>
               ))}
