@@ -58,6 +58,7 @@
     "date-fns": "latest",
     "embla-carousel-react": "8.5.2",
     "googleapis": "^146.0.0",
+    "heic2any": "^0.0.4",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
     "next": "15.2.1",

@@ -6,6 +6,7 @@ import { Button } from "@/app/components/ui/button";
 import { X } from "lucide-react";
 import { sendOcrImage } from "@/app/api/vision/ocr/route";
 import { getChatGPTResponse } from "@/app/api/vision/openai/route";
+import heic2any from "heic2any";
 
 // Common styles to prevent overflow
 const preventOverflowStyle = {
@@ -101,18 +102,43 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
       
       let imageFile = file;
       
-      // If it's an HEIC file and we're in a browser that doesn't support it natively,
-      // we would need to convert it. However, since we're just passing the file to an
-      // API for processing and not displaying it directly, we'll use it as is.
-      // The server-side OCR should handle the conversion if needed.
+      // If it's an HEIC file, convert it to JPEG before processing
+      if (isHeic) {
+        try {
+          setIsProcessingOcr(true); // Show loading state during conversion
+          setParseError("Converting HEIC image to JPEG...");
+          
+          // Convert the HEIC file to JPEG using the imported heic2any library
+          const jpegBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+            quality: 0.8
+          });
+          
+          // Create a new File object from the JPEG blob
+          imageFile = new File(
+            [jpegBlob as Blob], 
+            file.name.replace(/\.(heic|heif)$/i, '.jpg'),
+            { type: 'image/jpeg' }
+          );
+          
+          console.log("Converted HEIC to JPEG successfully");
+          setParseError(null);
+        } catch (conversionError) {
+          console.error("Error converting HEIC to JPEG:", conversionError);
+          setParseError("Unable to convert HEIC image. Please try another image format.");
+          setIsProcessingOcr(false);
+          return;
+        }
+      }
       
       setImage(imageFile);
       
-      // Create image preview - this is tricky with HEIC files as most browsers don't support them
-      // For simplicity, we'll create a preview even if it might not work for HEIC files
+      // Create image preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
+        if (isHeic) setIsProcessingOcr(false); // Turn off loading if we were converting
       };
       reader.readAsDataURL(imageFile);
       
@@ -120,10 +146,11 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
       setExtractedText(null);
       setAiResponse(null);
       setParsedEventData(null);
-      setParseError(null);
+      if (!isHeic) setParseError(null); // Only clear if we didn't already set a conversion message
     } catch (error) {
       console.error("Error processing the image:", error);
       setParseError("Error processing the image. Please try a different format.");
+      setIsProcessingOcr(false);
     }
   };
 
