@@ -13,6 +13,7 @@ import {
 } from "@/lib/calendar";
 import EventForm from "./event-form";
 import { calendarStyles } from "./calendarStyles";
+import GroupScheduler from "./grouping"; // Import the GroupScheduler component
 
 // Style to prevent horizontal scrolling
 const preventOverflowStyle = {
@@ -30,7 +31,7 @@ const Calendar: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [group, setGroup] = useState(false);
+  const [sidebarMode, setSidebarMode] = useState<'event' | 'group'>('event'); // New state for sidebar mode
 
   // Function to fetch events from Google Calendar
   const fetchEvents = async () => {
@@ -109,7 +110,7 @@ const Calendar: React.FC = () => {
     setSelectedEvent(formattedEvent);
     setIsNewEvent(false);
     setActiveSelection(null);
-
+    setSidebarMode('event'); // Ensure event mode is active
     setIsFormOpen(true);
   };
 
@@ -138,6 +139,7 @@ const Calendar: React.FC = () => {
         
         setSelectedEvent(singleDayEvent);
         setIsNewEvent(true);
+        setSidebarMode('event'); // Ensure event mode is active
         setIsFormOpen(true);
         return;
     }
@@ -166,6 +168,7 @@ const Calendar: React.FC = () => {
 
     setSelectedEvent(newEvent);
     setIsNewEvent(true);
+    setSidebarMode('event'); // Ensure event mode is active
     setIsFormOpen(true);
   };
   
@@ -194,6 +197,7 @@ const Calendar: React.FC = () => {
       
       setSelectedEvent(singleDayEvent);
       setIsNewEvent(true);
+      setSidebarMode('event'); // Ensure event mode is active
       setIsFormOpen(true);
     }
   };
@@ -421,6 +425,26 @@ const Calendar: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // New function to create a new event
+  const handleCreateNewEvent = () => {
+    // Create a new event at the current time
+    const now = new Date();
+    const endTime = new Date(now);
+    endTime.setHours(endTime.getHours() + 1);
+    
+    setSelectedEvent({
+      title: '',
+      start: now,
+      end: endTime,
+      allDay: false,
+      calendarId: 'primary',
+    });
+    setIsNewEvent(true);
+    setActiveSelection(null);
+    setSidebarMode('event');
+    setIsFormOpen(true);
+  };
+
   return (
     <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
@@ -437,8 +461,8 @@ const Calendar: React.FC = () => {
           timeGridPlugin,
           interactionPlugin,
         ]}
-        height="auto"  // Changed from "85vh" to "auto"
-        contentHeight="auto"  // Added to let content determine height
+        height="auto"
+        contentHeight="auto"
         editable={true}
         selectable={true} 
         selectMirror={true}
@@ -448,25 +472,9 @@ const Calendar: React.FC = () => {
         timeZone="local"
         customButtons={{
           myCustomButton: {
-            click: function () {
-              // Create a new event at the current time
-              const now = new Date();
-              const endTime = new Date(now);
-              endTime.setHours(endTime.getHours() + 1);
-              
-              setSelectedEvent({
-                title: '',
-                start: now,
-                end: endTime,
-                allDay: false,
-                calendarId: 'primary',
-              });
-              setIsNewEvent(true);
-              setActiveSelection(null);
-              setIsFormOpen(true);
-            },
+            click: handleCreateNewEvent,
             text: "",
-          },
+          }
         }}
         headerToolbar={{
           left: "prev,next myCustomButton",
@@ -491,24 +499,55 @@ const Calendar: React.FC = () => {
           <div className="p-6 w-full max-w-full" style={preventOverflowStyle}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
-                {selectedEvent?.id ? "Edit Event" : "Create New Event"}
+                {sidebarMode === 'event' 
+                  ? (selectedEvent?.id ? "Edit Event" : "Create New Event") 
+                  : "Group Scheduler"}
               </h2>
               <button 
                 onClick={handleFormClose}
                 className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors shrink-0"
                 disabled={isSyncing}
               >
-                {/* Fixed SVG attributes to use React camelCase */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            <EventForm
-              event={selectedEvent}
-              onClose={handleFormClose}
-              onFormSubmit={handleFormSubmitAndSuccess}
-              onDelete={handleEventDelete}
-              disabled={isSyncing}
-            />
+            
+            {/* Toggle buttons */}
+            <div className="flex border rounded-md mb-4">
+              <button
+                onClick={() => setSidebarMode('event')}
+                className={`flex-1 py-2 px-4 text-sm font-medium ${
+                  sidebarMode === 'event' 
+                    ? 'bg-blue-100 text-blue-700 border-blue-700' 
+                    : 'bg-white text-gray-700'
+                }`}
+              >
+                Create Event
+              </button>
+              <button
+                onClick={() => setSidebarMode('group')}
+                className={`flex-1 py-2 px-4 text-sm font-medium ${
+                  sidebarMode === 'group' 
+                    ? 'bg-blue-100 text-blue-700 border-blue-700' 
+                    : 'bg-white text-gray-700'
+                }`}
+              >
+                Group Scheduler
+              </button>
+            </div>
+            
+            {/* Conditional rendering based on mode */}
+            {sidebarMode === 'event' ? (
+              <EventForm
+                event={selectedEvent}
+                onClose={handleFormClose}
+                onFormSubmit={handleFormSubmitAndSuccess}
+                onDelete={handleEventDelete}
+                disabled={isSyncing}
+              />
+            ) : (
+              <GroupScheduler />
+            )}
           </div>
         )}
       </div>
@@ -521,7 +560,6 @@ const Calendar: React.FC = () => {
             onClick={() => setError(null)}
             className="ml-4 text-white opacity-80 hover:opacity-100"
           >
-            {/* Fixed SVG attributes to use React camelCase */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
