@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import './globals.css'
+import '@/styles/globals.css'
 import { AuthProvider } from './components/auth-provider';
 import { Analytics } from '@vercel/analytics/next';
 
