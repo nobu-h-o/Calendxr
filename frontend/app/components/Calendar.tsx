@@ -5,8 +5,14 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { getCalendarEvents, updateCalendarEvent, createCalendarEvent, deleteCalendarEvent } from "@/lib/calendar";
+import {
+  getCalendarEvents,
+  updateCalendarEvent,
+  createCalendarEvent,
+  deleteCalendarEvent,
+} from "@/lib/calendar";
 import EventForm from "./event-form";
+import GroupScheduler from "./group-scheduler";
 
 const Calendar: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
@@ -17,6 +23,7 @@ const Calendar: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [group, setGroup] = useState(false);
 
   // Function to fetch events from Google Calendar
   const fetchEvents = async () => {
@@ -32,7 +39,7 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
-  
+
   const clearSelection = () => {
     if (isNewEvent && calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
@@ -52,48 +59,48 @@ const Calendar: React.FC = () => {
 
   const handleEventClick = (clickInfo: any) => {
     const event = clickInfo.event;
-    
+
     const formattedEvent = {
       id: event.id,
       title: event.title,
-      description: event.extendedProps?.description || '',
-      location: event.extendedProps?.location || '',
+      description: event.extendedProps?.description || "",
+      location: event.extendedProps?.location || "",
       start: event.start,
       end: event.end,
       allDay: event.allDay,
-      calendarId: event.extendedProps?.calendarId || 'primary',
+      calendarId: event.extendedProps?.calendarId || "primary",
     };
-    
+
     console.log("Opening event for editing:", formattedEvent);
-    
+
     setSelectedEvent(formattedEvent);
     setIsNewEvent(false);
     setActiveSelection(null);
-    
+
     setIsFormOpen(true);
   };
 
   const handleDateSelect = (selectInfo: any) => {
     setActiveSelection(selectInfo);
-    
+
     const newEvent = {
-      title: '',
+      title: "",
       start: selectInfo.start,
       end: selectInfo.end,
       allDay: selectInfo.allDay,
-      calendarId: 'primary',
+      calendarId: "primary",
     };
-    
+
     console.log("Selected date range:", {
       start: selectInfo.start,
       end: selectInfo.end,
       allDay: selectInfo.allDay,
       view: selectInfo.view.type,
     });
-    
+
     setSelectedEvent(newEvent);
     setIsNewEvent(true);
-    
+
     setIsFormOpen(true);
   };
 
@@ -101,22 +108,22 @@ const Calendar: React.FC = () => {
     try {
       setIsSyncing(true);
       const { event, oldEvent } = changeInfo;
-      
-      const calendarId = event.extendedProps?.calendarId || 'primary'; 
+
+      const calendarId = event.extendedProps?.calendarId || "primary";
       const eventId = event.id;
-      
+
       const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
+
       let updateData: any = {
-        summary: event.title
+        summary: event.title,
       };
-      
+
       if (event.allDay) {
         const startDate = new Date(event.start);
-        
-        const startDateStr = startDate.toLocaleDateString('en-CA');
+
+        const startDateStr = startDate.toLocaleDateString("en-CA");
         updateData.start = { date: startDateStr };
-        
+
         let endDate;
         if (event.end) {
           endDate = new Date(event.end);
@@ -124,34 +131,34 @@ const Calendar: React.FC = () => {
           endDate = new Date(startDate);
           endDate.setDate(endDate.getDate() + 1);
         }
-        
-        const endDateStr = endDate.toLocaleDateString('en-CA');
+
+        const endDateStr = endDate.toLocaleDateString("en-CA");
         updateData.end = { date: endDateStr };
       } else {
         const eventTimezone = event.extendedProps?.timeZone || localTimezone;
-        
+
         if (event.start) {
           updateData.start = {
             dateTime: event.start.toISOString(),
-            timeZone: eventTimezone
+            timeZone: eventTimezone,
           };
         }
-        
+
         if (event.end) {
           updateData.end = {
             dateTime: event.end.toISOString(),
-            timeZone: eventTimezone
+            timeZone: eventTimezone,
           };
         } else if (event.start) {
           const endTime = new Date(event.start);
           endTime.setHours(endTime.getHours() + 1);
           updateData.end = {
             dateTime: endTime.toISOString(),
-            timeZone: eventTimezone
+            timeZone: eventTimezone,
           };
         }
       }
-      
+
       await updateCalendarEvent(calendarId, eventId, updateData);
       await fetchEvents(); // Refresh events
     } catch (error) {
@@ -176,23 +183,22 @@ const Calendar: React.FC = () => {
 
       if (selectedEvent?.id) {
         // Update existing event
-        const calendarId = selectedEvent.calendarId || 'primary';
+        const calendarId = selectedEvent.calendarId || "primary";
         await updateCalendarEvent(calendarId, selectedEvent.id, formValues);
       } else {
         // Create new event
-        const calendarId = 'primary';
+        const calendarId = "primary";
         await createCalendarEvent(calendarId, formValues);
       }
 
       // Refresh events
       await fetchEvents();
-      
+
       // Clear selection after a delay to ensure the event is rendered
       setTimeout(() => {
         clearSelection();
         setIsSyncing(false);
       }, 500);
-      
     } catch (error) {
       console.error("Error saving event:", error);
       setIsSyncing(false);
@@ -203,17 +209,16 @@ const Calendar: React.FC = () => {
   const handleEventDelete = async (calendarId: string, eventId: string) => {
     try {
       setIsSyncing(true);
-      
+
       // Close the form
       setIsFormOpen(false);
-      
+
       // Delete the event
       await deleteCalendarEvent(calendarId, eventId);
       console.log("Event deleted successfully");
-      
+
       // Refresh events
       await fetchEvents();
-      
     } catch (error) {
       console.error("Error deleting event:", error);
     } finally {
@@ -234,8 +239,8 @@ const Calendar: React.FC = () => {
     if (isNewEvent && activeSelection && !isFormOpen && isSyncing) {
       if (calendarRef.current) {
         const calendarApi = calendarRef.current.getApi();
-        
-        if (!document.querySelector('.fc-highlight')) {
+
+        if (!document.querySelector(".fc-highlight")) {
           calendarApi.select(
             activeSelection.start,
             activeSelection.end,
@@ -253,13 +258,9 @@ const Calendar: React.FC = () => {
         <FullCalendar
           ref={calendarRef}
           height="85vh"
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-          ]}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           editable={true}
-          selectable={true} 
+          selectable={true}
           selectMirror={true}
           unselectAuto={false}
           selectLongPressDelay={0}
@@ -275,11 +276,17 @@ const Calendar: React.FC = () => {
               },
               icon: "plus-lg",
             },
+            myCustomButton2: {
+              click: function () {
+                setGroup(!group);
+              },
+              icon: "plus",
+            },
           }}
           headerToolbar={{
             left: "prev,next myCustomButton",
             center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
+            right: "myCustomButton2, dayGridMonth,timeGridWeek,timeGridDay",
           }}
           initialView="dayGridMonth"
           events={events}
@@ -288,18 +295,22 @@ const Calendar: React.FC = () => {
           select={handleDateSelect}
         />
       </div>
-      
+
       {/* Side panel form */}
-      <div className={`fixed right-0 top-0 bottom-0 transition-transform transform ${isFormOpen ? 'translate-x-0' : 'translate-x-full'} z-40 bg-background border-l border-border shadow-xl w-[400px] overflow-auto`}>
+      <div
+        className={`fixed right-0 top-0 bottom-0 transition-transform transform ${
+          isFormOpen ? "translate-x-0" : "translate-x-full"
+        } z-40 bg-background border-l border-border shadow-xl w-[400px] overflow-auto`}
+      >
         {isFormOpen && (
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
-                {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
+                {selectedEvent?.id ? "Edit Event" : "Create New Event"}
               </h2>
             </div>
-            <EventForm 
-              event={selectedEvent} 
+            <EventForm
+              event={selectedEvent}
               onClose={handleFormClose}
               onFormSubmit={handleFormSubmitAndSuccess}
               onDelete={handleEventDelete} // Add the delete handler
@@ -307,6 +318,18 @@ const Calendar: React.FC = () => {
             />
           </div>
         )}
+        {error && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-4 text-white font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+      </div>
       {error && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
           <span>{error}</span>
@@ -318,18 +341,12 @@ const Calendar: React.FC = () => {
           </button>
         </div>
       )}
-      </div>
-    {error && (
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
-        <span>{error}</span>
-        <button
-          onClick={() => setError(null)}
-          className="ml-4 text-white font-bold"
-        >
-          ✕
-        </button>
-      </div>
-    )}
+      {/* {group && (
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6"></div>
+          <GroupScheduler />
+        </div>
+      )} */}
     </div>
   );
 };
