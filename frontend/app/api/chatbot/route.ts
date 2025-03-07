@@ -38,7 +38,12 @@ export async function sendChatMessage(input: string): Promise<ChatCompletionResp
       return response;
     } catch (error) {
       console.error("Error sending chat message:", error);
-      return "Error occurred.";
+      return {
+        id: "error",
+        choices: [
+          { message: { role: "system", content: "Error occurred." } }
+        ]
+      };
     }
 }
 /**
@@ -53,7 +58,7 @@ export async function sendChatMessage(input: string): Promise<ChatCompletionResp
  */
 export async function getMessages(completionId: string): Promise<any> {
   try {
-    const url = `https://api.openai.com/v1/chat/completions/${completionId}/messages`;
+    const url = `https://api.openai.com/v1/chat/completions/${completionId}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -63,9 +68,9 @@ export async function getMessages(completionId: string): Promise<any> {
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+      console.error(`HTTP error! status: ${res.status}`);
     }
-    const data = await res.json();
+    const data = await res;
     return data;
   } catch (error) {
     console.error("Error retrieving messages:", error);
