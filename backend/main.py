@@ -377,16 +377,16 @@ async def ocr_image(image: UploadFile = File(...)):
             "client_x509_cert_url": CLIENT_X509_CERT_URL,
             "universe_domain": UNIVERSE_DOMAIN
         }
-        
+
         # Create credentials object
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
-        
+
         # Create Vision client
         client = vision.ImageAnnotatorClient(
-            credentials=credentials, 
+            credentials=credentials,
             client_options={"api_endpoint": "vision.googleapis.com"}
         )
-        
+
         # Process the image
         content = await image.read()
         vision_image = vision.Image(content=content)
@@ -396,3 +396,11 @@ async def ocr_image(image: UploadFile = File(...)):
         return {"text": result_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OCR service error: {str(e)}")
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "FastAPI is running"}
+
+@app.get("/test-json")
+def test_json():
+    return {"message": "This is a test JSON response", "status": "success"}
