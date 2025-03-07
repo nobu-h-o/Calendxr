@@ -5,7 +5,8 @@ import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
-import { getMessages, sendChatMessage, createDocumentByText, getKnowledgeBase, deleteDocument, getDocumentList } from "../../utils/api";
+import { sendChatMessage, getMessages } from "@/app/api/chatbot/route";
+
 import { useState, useEffect, useRef } from "react";
 import { UIMessage } from "ai";
 
@@ -18,48 +19,48 @@ export function ChatInterface() {
   const [conversationID, setConversationID] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
-  useEffect(() => {
-    const fetchAndStoreCalendarData = async () => {
+  // useEffect(() => {
+  //   const fetchAndStoreCalendarData = async () => {
 
-      const dataset = await getKnowledgeBase();
-      if (!dataset) {
-        console.error("Error fetching dataset:", dataset);
-        return;
-      }
-      const datasetId = dataset.data[dataset.data.length - 1]?.id;
-      const documents = await getDocumentList(datasetId);
+  //     // const dataset = await getKnowledgeBase();
+  //     // if (!dataset) {
+  //     //   console.error("Error fetching dataset:", dataset);
+  //     //   return;
+  //     // }
+  //     // const datasetId = dataset.data[dataset.data.length - 1]?.id;
+  //     // const documents = await getDocumentList(datasetId);
       
-      documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
+  //     // documents.data.map((doc: { id: string }) => deleteDocument(datasetId, doc.id));
 
-      try {
-        console.log("Dataset ID:", datasetId);
+  //     try {
+  //       console.log("Dataset ID:", datasetId);
 
-        const response = await fetch(`${PORT}/api/calendar/get`);
-        console.log("Response:", response);
-        if (!response.ok) throw new Error("Failed to fetch calendar data");
-        const calendarData = await response.json();
+  //       const response = await fetch(`${PORT}/api/calendar/get`);
+  //       console.log("Response:", response);
+  //       if (!response.ok) throw new Error("Failed to fetch calendar data");
+  //       const calendarData = await response.json();
 
-        const filteredData = calendarData.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
-          title,
-          start : new Date(start),
-          end: new Date(end),
-        }));
+  //       const filteredData = calendarData.map(({ title, start, end }: { title: string; start: string; end: string }) => ({
+  //         title,
+  //         start : new Date(start),
+  //         end: new Date(end),
+  //       }));
   
-        // If data has changed, update the dataset
-        await createDocumentByText(datasetId, {
-          title: "Calendar Events",
-          content: JSON.stringify(filteredData),
-        });
+  //       // If data has changed, update the dataset
+  //       await createDocumentByText(datasetId, {
+  //         title: "Calendar Events",
+  //         content: JSON.stringify(filteredData),
+  //       });
   
-        console.log("Calendar data updated successfully.");
-      } catch (error) {
-        console.error("Error fetching and storing calendar data:", error);
-      }
-    };
-    // Run immediately on page load
-    fetchAndStoreCalendarData();
+  //       console.log("Calendar data updated successfully.");
+  //     } catch (error) {
+  //       console.error("Error fetching and storing calendar data:", error);
+  //     }
+  //   };
+  //   // Run immediately on page load
+  //   fetchAndStoreCalendarData();
     
-  }, [conversationID]);
+  // }, [conversationID]);
   
 
   // Load existing messages when conversation ID changes
@@ -121,14 +122,14 @@ export function ChatInterface() {
     setMessage("");
     
     try {
-      const response = await sendChatMessage(currentMessage, conversationID);
-      setConversationID(response.conversation_id);
+      const response = await sendChatMessage(currentMessage);
+      setConversationID(response.id);
       
       const assistantMessage: UIMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response.answer || "No response",
-        parts: [{ type: "text", text: response.answer || "No response" }],
+        content: response.choices?.[0]?.message?.content || "No response",
+        parts: [{ type: "text", text: response.choices?.[0]?.message?.content || "No response" }],
       };
       
       setMessages(prev => [...prev, assistantMessage]);
