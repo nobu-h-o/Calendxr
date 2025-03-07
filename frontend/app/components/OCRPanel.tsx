@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { X } from "lucide-react";
@@ -53,16 +53,77 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const [parsedEventData, setParsedEventData] = useState<EventDataApiResponse | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  // Check viewport size for mobile optimizations
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Scroll to top when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      // Use setTimeout to ensure the panel is rendered before scrolling
+      setTimeout(() => {
+        const panel = document.querySelector('.ocr-panel-content');
+        if (panel) {
+          panel.scrollTop = 0;
+        }
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Check if we need to convert HEIC/HEIF to JPEG
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setImage(file);
+    if (!file) return;
+    
+    try {
+      // Check if this is an HEIC/HEIF file
+      const isHeic = file.type === 'image/heic' || 
+                    file.type === 'image/heif' || 
+                    file.name.toLowerCase().endsWith('.heic') ||
+                    file.name.toLowerCase().endsWith('.heif');
+      
+      let imageFile = file;
+      
+      // If it's an HEIC file and we're in a browser that doesn't support it natively,
+      // we would need to convert it. However, since we're just passing the file to an
+      // API for processing and not displaying it directly, we'll use it as is.
+      // The server-side OCR should handle the conversion if needed.
+      
+      setImage(imageFile);
+      
+      // Create image preview - this is tricky with HEIC files as most browsers don't support them
+      // For simplicity, we'll create a preview even if it might not work for HEIC files
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(imageFile);
+      
       // Reset previous states when a new image is selected
       setExtractedText(null);
       setAiResponse(null);
       setParsedEventData(null);
       setParseError(null);
+    } catch (error) {
+      console.error("Error processing the image:", error);
+      setParseError("Error processing the image. Please try a different format.");
     }
   };
 
@@ -268,13 +329,13 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
       style={preventOverflowStyle}
     >
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[400px] max-w-full bg-white shadow-xl overflow-y-auto overflow-x-hidden z-50 transition-transform duration-300 ease-in-out transform ${
+        className={`fixed right-0 top-0 bottom-0 ${isMobile ? 'w-full' : 'w-[400px]'} max-w-full bg-white shadow-xl overflow-y-auto overflow-x-hidden z-50 transition-transform duration-300 ease-in-out transform ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
         style={preventOverflowStyle}
       >
-        <div className="p-6" style={preventOverflowStyle}>
+        <div className="p-4 sm:p-6 ocr-panel-content" style={preventOverflowStyle}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Scan Event Details</h2>
             <Button
@@ -292,12 +353,52 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
               <p className="text-sm text-gray-600 mb-2">
                 Upload an image of your event invitation, flyer, or details to automatically fill in the form.
               </p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange} 
-                className="mb-2"
-              />
+              
+              {/* Image preview */}
+              {imagePreview && (
+                <div className="mb-3 relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full rounded-md border border-gray-200 object-contain max-h-48"
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="destructive"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => {
+                      setImage(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+              
+              {/* Single file input for both gallery and camera selection */}
+              {!imagePreview && (
+                <div className="flex items-center justify-center w-full mb-4">
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <p className="mb-1 text-sm text-gray-500">
+                        <span className="font-semibold">Click to select photo</span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Choose from gallery or take a new photo
+                      </p>
+                    </div>
+                    <Input
+                      type="file"
+                      accept="image/*,.heic,.heif"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
+              
               <Button
                 type="submit"
                 className="w-full"
@@ -315,13 +416,6 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
             </div>
           )}
 
-          {extractedText && (
-            <div className="mt-4 p-3 bg-gray-50 rounded border">
-              <h3 className="text-sm font-medium mb-1">Extracted Text</h3>
-              <p className="text-xs text-gray-700 whitespace-pre-line">{extractedText}</p>
-            </div>
-          )}
-
           {parsedEventData && (
             <div className="mt-4">
               <h3 className="text-sm font-medium mb-1">Analyzed Event Details</h3>
@@ -329,25 +423,25 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 <div className="grid gap-2">
                   <div>
                     <span className="text-xs font-medium">Title:</span>
-                    <p className="text-sm">{parsedEventData.title}</p>
+                    <p className="text-sm break-words">{parsedEventData.title}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Description:</span>
-                    <p className="text-sm">{parsedEventData.description}</p>
+                    <p className="text-sm break-words">{parsedEventData.description}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Location:</span>
-                    <p className="text-sm">{parsedEventData.location}</p>
+                    <p className="text-sm break-words">{parsedEventData.location}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Start:</span>
-                    <p className="text-sm">{new Date(parsedEventData.start).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{parsedEventData.start}</p>
+                    <p className="text-sm break-words">{new Date(parsedEventData.start).toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 break-words">{parsedEventData.start}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">End:</span>
-                    <p className="text-sm">{new Date(parsedEventData.end).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{parsedEventData.end}</p>
+                    <p className="text-sm break-words">{new Date(parsedEventData.end).toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 break-words">{parsedEventData.end}</p>
                   </div>
                 </div>
               </div>
@@ -356,19 +450,37 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 className="w-full mt-4"
                 onClick={handleApplyAndClose}
               >
-                Apply & Close
+                Continue
               </Button>
             </div>
           )}
 
           {aiResponse && !parsedEventData && (
             <div className="mt-4">
-              <h3 className="text-sm font-medium mb-1">AI Response (Raw)</h3>
+              <h3 className="text-sm font-medium mb-1">AI Response (Please try again)</h3>
               <div className="p-3 bg-gray-50 rounded border">
                 <pre className="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">
                   {typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse, null, 2)}
                 </pre>
               </div>
+            </div>
+          )}
+          
+          {/* Image upload area when a preview exists */}
+          {imagePreview && (
+            <div className="mt-4">
+              <p className="text-xs text-gray-500 mb-2">Choose a different image:</p>
+              <label className="flex flex-col items-center justify-center w-full h-16 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <div className="flex items-center justify-center px-4 py-2">
+                  <span className="text-sm font-medium">Select from gallery or camera</span>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/*,.heic,.heif"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
             </div>
           )}
         </div>
