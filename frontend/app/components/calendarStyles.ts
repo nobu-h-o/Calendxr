@@ -260,7 +260,6 @@ export const calendarStyles = `
 .fc-timegrid-slots table {
   height: auto !important;
 }
-<<<<<<< HEAD
 
 /* Mobile-specific styles */
 @media (max-width: 768px) {
@@ -394,6 +393,4 @@ export const calendarStyles = `
     font-size: 0.8rem;
   }
 }
-=======
->>>>>>> main
 `;
