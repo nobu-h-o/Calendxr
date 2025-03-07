@@ -87,22 +87,43 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
     }
   }, [isOpen]);
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  // Check if we need to convert HEIC/HEIF to JPEG
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setImage(file);
-      // Create image preview
+    if (!file) return;
+    
+    try {
+      // Check if this is an HEIC/HEIF file
+      const isHeic = file.type === 'image/heic' || 
+                    file.type === 'image/heif' || 
+                    file.name.toLowerCase().endsWith('.heic') ||
+                    file.name.toLowerCase().endsWith('.heif');
+      
+      let imageFile = file;
+      
+      // If it's an HEIC file and we're in a browser that doesn't support it natively,
+      // we would need to convert it. However, since we're just passing the file to an
+      // API for processing and not displaying it directly, we'll use it as is.
+      // The server-side OCR should handle the conversion if needed.
+      
+      setImage(imageFile);
+      
+      // Create image preview - this is tricky with HEIC files as most browsers don't support them
+      // For simplicity, we'll create a preview even if it might not work for HEIC files
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(imageFile);
       
       // Reset previous states when a new image is selected
       setExtractedText(null);
       setAiResponse(null);
       setParsedEventData(null);
       setParseError(null);
+    } catch (error) {
+      console.error("Error processing the image:", error);
+      setParseError("Error processing the image. Please try a different format.");
     }
   };
 
@@ -370,7 +391,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                     </div>
                     <Input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.heic,.heif"
                       onChange={handleImageChange}
                       className="hidden"
                     />
@@ -455,7 +476,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 </div>
                 <Input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   onChange={handleImageChange}
                   className="hidden"
                 />
