@@ -74,6 +74,19 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
     };
   }, []);
 
+  // Scroll to top when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      // Use setTimeout to ensure the panel is rendered before scrolling
+      setTimeout(() => {
+        const panel = document.querySelector('.ocr-panel-content');
+        if (panel) {
+          panel.scrollTop = 0;
+        }
+      }, 100);
+    }
+  }, [isOpen]);
+
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -301,7 +314,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
         onClick={(e) => e.stopPropagation()}
         style={preventOverflowStyle}
       >
-        <div className={`p-${isMobile ? '4' : '6'}`} style={preventOverflowStyle}>
+        <div className="p-4 sm:p-6 ocr-panel-content" style={preventOverflowStyle}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Scan Event Details</h2>
             <Button
@@ -343,13 +356,26 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                 </div>
               )}
               
+              {/* Single file input for both gallery and camera selection */}
               {!imagePreview && (
-                <Input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleImageChange} 
-                  className="mb-2 cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
-                />
+                <div className="flex items-center justify-center w-full mb-4">
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <p className="mb-1 text-sm text-gray-500">
+                        <span className="font-semibold">Click to select photo</span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Choose from gallery or take a new photo
+                      </p>
+                    </div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
               )}
               
               <Button
@@ -423,26 +449,17 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
           {imagePreview && (
             <div className="mt-4">
               <p className="text-xs text-gray-500 mb-2">Choose a different image:</p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange} 
-                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
-              />
-            </div>
-          )}
-          
-          {/* Camera capture for mobile devices */}
-          {isMobile && !isProcessingOcr && (
-            <div className="mt-4">
-              <p className="text-xs text-gray-500 mb-2">Or take a photo:</p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                capture="environment"
-                onChange={handleImageChange} 
-                className="cursor-pointer file:cursor-pointer hover:file:cursor-pointer"
-              />
+              <label className="flex flex-col items-center justify-center w-full h-16 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <div className="flex items-center justify-center px-4 py-2">
+                  <span className="text-sm font-medium">Select from gallery or camera</span>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
             </div>
           )}
         </div>
