@@ -889,14 +889,14 @@ protoc-gen-openapiv2 = "*"
 
 [[package]]
 name = "flytekit"
-version = "1.15.0"
+version = "1.15.1"
 description = "Flyte SDK for Python"
 optional = false
 python-versions = "<3.13,>=3.9"
 groups = ["main"]
 files = [
-    {file = "flytekit-1.15.0-py3-none-any.whl", hash = "sha256:ed0c5a75a943ff70d3886bc84ec4460e5603225d30a1743f230464591134fdc2"},
-    {file = "flytekit-1.15.0.tar.gz", hash = "sha256:a8bb011cf6d2f27e39174527a3f4b7f0ee57b0c16c03acbc9256fd32896560b2"},
+    {file = "flytekit-1.15.1-py3-none-any.whl", hash = "sha256:91382baf3fe18707527860d20da4393f097af15d1926e97767ffa5155314d337"},
+    {file = "flytekit-1.15.1.tar.gz", hash = "sha256:f31131be2d8cbbb720db354835833f8d5c9904790dd477582fd396db9e5d1c78"},
 ]
 
 [package.dependencies]
@@ -908,7 +908,7 @@ dataclasses-json = ">=0.5.2,<0.5.12"
 diskcache = ">=5.2.1"
 docker = ">=4.0.0"
 docstring-parser = ">=0.9.0"
-flyteidl = ">=1.15.0"
+flyteidl = ">=1.15.1"
 fsspec = ">=2023.3.0"
 gcsfs = ">=2023.3.0"
 googleapis-common-protos = ">=1.57"
@@ -936,6 +936,9 @@ s3fs = ">=2023.3.0,<2024.3.1 || >2024.3.1"
 statsd = ">=3.0.0"
 typing_extensions = "*"
 urllib3 = ">=1.22"
+
+[package.extras]
+agent = ["grpcio-health-checking (<=1.68.0)", "httpx", "prometheus-client"]
 
 [[package]]
 name = "frozenlist"
@@ -1312,14 +1315,14 @@ requests = ["requests (>=2.18.0,<3.0.0dev)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.69.0"
+version = "1.69.1"
 description = "Common protobufs used in Google APIs"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "googleapis_common_protos-1.69.0-py2.py3-none-any.whl", hash = "sha256:17835fdc4fa8da1d61cfe2d4d5d57becf7c61d4112f8d81c67eaa9d7ce43042d"},
-    {file = "googleapis_common_protos-1.69.0.tar.gz", hash = "sha256:5a46d58af72846f59009b9c4710425b9af2139555c71837081706b213b298187"},
+    {file = "googleapis_common_protos-1.69.1-py2.py3-none-any.whl", hash = "sha256:4077f27a6900d5946ee5a369fab9c8ded4c0ef1c6e880458ea2f70c14f7b70d5"},
+    {file = "googleapis_common_protos-1.69.1.tar.gz", hash = "sha256:e20d2d8dda87da6fe7340afbbdf4f0bcb4c8fae7e6cadf55926c31f946b0b9b1"},
 ]
 
 [package.dependencies]
@@ -2777,18 +2780,18 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-json-logger"
-version = "3.2.1"
+version = "3.3.0"
 description = "JSON Log Formatter for the Python Logging Package"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "python_json_logger-3.2.1-py3-none-any.whl", hash = "sha256:cdc17047eb5374bd311e748b42f99d71223f3b0e186f4206cc5d52aefe85b090"},
-    {file = "python_json_logger-3.2.1.tar.gz", hash = "sha256:8eb0554ea17cb75b05d2848bc14fb02fbdbd9d6972120781b974380bfa162008"},
+    {file = "python_json_logger-3.3.0-py3-none-any.whl", hash = "sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7"},
+    {file = "python_json_logger-3.3.0.tar.gz", hash = "sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84"},
 ]
 
 [package.extras]
-dev = ["backports.zoneinfo ; python_version < \"3.9\"", "black", "build", "freezegun", "mdx_truly_sane_lists", "mike", "mkdocs", "mkdocs-awesome-pages-plugin", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-material (>=8.5)", "mkdocstrings[python]", "msgspec ; implementation_name != \"pypy\" and python_version < \"3.13\"", "msgspec-python313-pre ; implementation_name != \"pypy\" and python_version == \"3.13\"", "mypy", "orjson ; implementation_name != \"pypy\"", "pylint", "pytest", "tzdata", "validate-pyproject[all]"]
+dev = ["backports.zoneinfo ; python_version < \"3.9\"", "black", "build", "freezegun", "mdx_truly_sane_lists", "mike", "mkdocs", "mkdocs-awesome-pages-plugin", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-material (>=8.5)", "mkdocstrings[python]", "msgspec ; implementation_name != \"pypy\"", "mypy", "orjson ; implementation_name != \"pypy\"", "pylint", "pytest", "tzdata", "validate-pyproject[all]"]
 
 [[package]]
 name = "python-multipart"
@@ -3189,14 +3192,14 @@ files = [
 
 [[package]]
 name = "starlette"
-version = "0.46.0"
+version = "0.46.1"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "starlette-0.46.0-py3-none-any.whl", hash = "sha256:913f0798bd90ba90a9156383bcf1350a17d6259451d0d8ee27fc0cf2db609038"},
-    {file = "starlette-0.46.0.tar.gz", hash = "sha256:b359e4567456b28d473d0193f34c0de0ed49710d75ef183a74a5ce0499324f50"},
+    {file = "starlette-0.46.1-py3-none-any.whl", hash = "sha256:77c74ed9d2720138b25875133f3a2dae6d854af2ec37dceb56aef370c1d8a227"},
+    {file = "starlette-0.46.1.tar.gz", hash = "sha256:3c88d58ee4bd1bb807c0d1acb381838afc7752f9ddaec81bbe4383611d833230"},
 ]
 
 [package.dependencies]
@@ -3353,21 +3356,21 @@ files = [
 
 [[package]]
 name = "union"
-version = "0.1.153"
+version = "0.1.155"
 description = "Adds Union specific functionality to Flytekit"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "union-0.1.153-py3-none-any.whl", hash = "sha256:937980cf855720f5941a249cab64889522cae6ddfa296ac1b9b596b8feb683a7"},
-    {file = "union-0.1.153.tar.gz", hash = "sha256:f94b2cfee52d5feee71227d52b77e74da21a5ca59dc1cf951c7fec56c04161fd"},
+    {file = "union-0.1.155-py3-none-any.whl", hash = "sha256:805636e1dc628a2eb8844ca61b0c9dd359475f45a0c9c96c687171f21a155c14"},
+    {file = "union-0.1.155.tar.gz", hash = "sha256:c95485b3b0c155ff660040e1ffa712c105d756bdc80cf76f83b9d45fe48c6620"},
 ]
 
 [package.dependencies]
 aiofiles = ">=23.2.1"
 click = "*"
-flyteidl = ">=v1.14.0"
-flytekit = ">=v1.15.0"
+flyteidl = ">=v1.15.1"
+flytekit = ">=v1.15.1"
 fsspec = ">=2023.3.0"
 googleapis-common-protos = ">=1.57"
 grpcio = "<1.68.0 || >1.68.0,<1.68.1 || >1.68.1"

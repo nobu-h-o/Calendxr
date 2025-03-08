@@ -5,15 +5,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import {
-  getCalendarEvents,
-  updateCalendarEvent,
-  createCalendarEvent,
-  deleteCalendarEvent,
-} from "@/lib/calendar";
+import { getCalendarEvents, updateCalendarEvent, createCalendarEvent, deleteCalendarEvent } from "@/lib/calendar";
 import EventForm from "./event-form";
 import { calendarStyles } from "./calendarStyles";
-import GroupScheduler from "./grouping"; // Import the GroupScheduler component
 
 // Style to prevent horizontal scrolling
 const preventOverflowStyle = {
@@ -31,7 +25,6 @@ const Calendar: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarMode, setSidebarMode] = useState<'event' | 'group'>('event'); // New state for sidebar mode
 
   // Function to fetch events from Google Calendar
   const fetchEvents = async () => {
@@ -57,7 +50,7 @@ const Calendar: React.FC = () => {
       document.head.removeChild(styleElement);
     };
   }, []);
-
+  
   const clearSelection = () => {
     if (isNewEvent && calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
@@ -92,8 +85,8 @@ const Calendar: React.FC = () => {
     const formattedEvent = {
       id: event.id,
       title: event.title,
-      description: event.extendedProps?.description || "",
-      location: event.extendedProps?.location || "",
+      description: event.extendedProps?.description || '',
+      location: event.extendedProps?.location || '',
       start: event.start,
       end: adjustedEnd, // Use adjusted end date
       displayEnd: adjustedEnd, // Keep track of display end date
@@ -104,13 +97,13 @@ const Calendar: React.FC = () => {
         event.start && adjustedEnd && 
         event.start.toDateString() === adjustedEnd.toDateString() // Flag if it's a single-day event
     };
-
+    
     console.log("Opening event for editing:", formattedEvent);
-
+    
     setSelectedEvent(formattedEvent);
     setIsNewEvent(false);
     setActiveSelection(null);
-    setSidebarMode('event'); // Ensure event mode is active
+    
     setIsFormOpen(true);
   };
 
@@ -139,7 +132,6 @@ const Calendar: React.FC = () => {
         
         setSelectedEvent(singleDayEvent);
         setIsNewEvent(true);
-        setSidebarMode('event'); // Ensure event mode is active
         setIsFormOpen(true);
         return;
     }
@@ -158,17 +150,16 @@ const Calendar: React.FC = () => {
       allDay: allDay,
       calendarId: 'primary',
     };
-
+    
     console.log("Selected date range:", {
       start: startDate,
       end: displayEnd,
       allDay: allDay,
       view: view,
     });
-
+    
     setSelectedEvent(newEvent);
     setIsNewEvent(true);
-    setSidebarMode('event'); // Ensure event mode is active
     setIsFormOpen(true);
   };
   
@@ -197,7 +188,6 @@ const Calendar: React.FC = () => {
       
       setSelectedEvent(singleDayEvent);
       setIsNewEvent(true);
-      setSidebarMode('event'); // Ensure event mode is active
       setIsFormOpen(true);
     }
   };
@@ -206,22 +196,22 @@ const Calendar: React.FC = () => {
     try {
       setIsSyncing(true);
       const { event, oldEvent } = changeInfo;
-
-      const calendarId = event.extendedProps?.calendarId || "primary";
+      
+      const calendarId = event.extendedProps?.calendarId || 'primary'; 
       const eventId = event.id;
-
+      
       const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+      
       let updateData: any = {
-        summary: event.title,
+        summary: event.title
       };
-
+      
       if (event.allDay) {
         const startDate = new Date(event.start);
-
-        const startDateStr = startDate.toLocaleDateString("en-CA");
+        
+        const startDateStr = startDate.toLocaleDateString('en-CA');
         updateData.start = { date: startDateStr };
-
+        
         let endDate;
         if (event.end) {
           endDate = new Date(event.end);
@@ -229,8 +219,8 @@ const Calendar: React.FC = () => {
           endDate = new Date(startDate);
           endDate.setDate(endDate.getDate() + 1);
         }
-
-        const endDateStr = endDate.toLocaleDateString("en-CA");
+        
+        const endDateStr = endDate.toLocaleDateString('en-CA');
         updateData.end = { date: endDateStr };
       } else {
         const toLocalISOString = (date: Date): string => {
@@ -254,7 +244,7 @@ const Calendar: React.FC = () => {
             dateTime: toLocalISOString(new Date(event.start))
           };
         }
-
+        
         if (event.end) {
           updateData.end = {
             dateTime: toLocalISOString(new Date(event.end))
@@ -267,7 +257,7 @@ const Calendar: React.FC = () => {
           };
         }
       }
-
+      
       await updateCalendarEvent(calendarId, eventId, updateData);
       // await fetchEvents(); // Refresh events after update
     } catch (error) {
@@ -322,22 +312,23 @@ const Calendar: React.FC = () => {
 
       if (selectedEvent?.id) {
         // Update existing event
-        const calendarId = selectedEvent.calendarId || "primary";
+        const calendarId = selectedEvent.calendarId || 'primary';
         await updateCalendarEvent(calendarId, selectedEvent.id, formValues);
       } else {
         // Create new event
-        const calendarId = "primary";
+        const calendarId = 'primary';
         await createCalendarEvent(calendarId, formValues);
       }
 
       // Refresh events
       await fetchEvents();
-
+      
       // Clear selection after a delay to ensure the event is rendered
       setTimeout(() => {
         clearSelection();
         setIsSyncing(false);
       }, 500);
+      
     } catch (error) {
       console.error("Error saving event:", error);
       setError("Failed to save event. Please try again.");
@@ -357,7 +348,7 @@ const Calendar: React.FC = () => {
   
     try {
       setIsSyncing(true);
-
+      
       // Close the form
       setIsFormOpen(false);
       
@@ -396,8 +387,8 @@ const Calendar: React.FC = () => {
     if (isNewEvent && activeSelection && !isFormOpen && isSyncing) {
       if (calendarRef.current) {
         const calendarApi = calendarRef.current.getApi();
-
-        if (!document.querySelector(".fc-highlight")) {
+        
+        if (!document.querySelector('.fc-highlight')) {
           calendarApi.select(
             activeSelection.start,
             activeSelection.end,
@@ -425,35 +416,10 @@ const Calendar: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // New function to create a new event
-  const handleCreateNewEvent = () => {
-    // Create a new event at the current time
-    const now = new Date();
-    const endTime = new Date(now);
-    endTime.setHours(endTime.getHours() + 1);
-    
-    setSelectedEvent({
-      title: '',
-      start: now,
-      end: endTime,
-      allDay: false,
-      calendarId: 'primary',
-    });
-    setIsNewEvent(true);
-    setActiveSelection(null);
-    setSidebarMode('event');
-    setIsFormOpen(true);
-  };
-
   return (
     <div className="relative flex w-full overflow-x-hidden" style={preventOverflowStyle}>
       {/* Calendar takes the full width */}
-      <div className="flex-1 rounded-lg shadow-sm overflow-hidden calendar-container" style={{
-        ...preventOverflowStyle,
-        backgroundColor: "hsl(var(--background))",
-        color: "hsl(var(--foreground))",
-        borderColor: "hsl(var(--border))"
-      }}>
+      <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden" style={preventOverflowStyle}>
       <FullCalendar
         ref={calendarRef}
         plugins={[
@@ -461,8 +427,8 @@ const Calendar: React.FC = () => {
           timeGridPlugin,
           interactionPlugin,
         ]}
-        height="auto"
-        contentHeight="auto"
+        height="auto"  // Changed from "85vh" to "auto"
+        contentHeight="auto"  // Added to let content determine height
         editable={true}
         selectable={true} 
         selectMirror={true}
@@ -472,9 +438,25 @@ const Calendar: React.FC = () => {
         timeZone="local"
         customButtons={{
           myCustomButton: {
-            click: handleCreateNewEvent,
+            click: function () {
+              // Create a new event at the current time
+              const now = new Date();
+              const endTime = new Date(now);
+              endTime.setHours(endTime.getHours() + 1);
+              
+              setSelectedEvent({
+                title: '',
+                start: now,
+                end: endTime,
+                allDay: false,
+                calendarId: 'primary',
+              });
+              setIsNewEvent(true);
+              setActiveSelection(null);
+              setIsFormOpen(true);
+            },
             text: "",
-          }
+          },
         }}
         headerToolbar={{
           left: "prev,next myCustomButton",
@@ -499,55 +481,24 @@ const Calendar: React.FC = () => {
           <div className="p-6 w-full max-w-full" style={preventOverflowStyle}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
-                {sidebarMode === 'event' 
-                  ? (selectedEvent?.id ? "Edit Event" : "Create New Event") 
-                  : "Group Scheduler"}
+                {selectedEvent?.id ? 'Edit Event' : 'Create New Event'}
               </h2>
               <button 
                 onClick={handleFormClose}
                 className="rounded-full p-2 hover:bg-gray-100 text-gray-500 transition-colors shrink-0"
                 disabled={isSyncing}
               >
+                {/* Fixed SVG attributes to use React camelCase */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            
-            {/* Toggle buttons */}
-            <div className="flex border rounded-md mb-4">
-              <button
-                onClick={() => setSidebarMode('event')}
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  sidebarMode === 'event' 
-                    ? 'bg-blue-100 text-blue-700 border-blue-700' 
-                    : 'bg-white text-gray-700'
-                }`}
-              >
-                Create Event
-              </button>
-              <button
-                onClick={() => setSidebarMode('group')}
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  sidebarMode === 'group' 
-                    ? 'bg-blue-100 text-blue-700 border-blue-700' 
-                    : 'bg-white text-gray-700'
-                }`}
-              >
-                Group Scheduler
-              </button>
-            </div>
-            
-            {/* Conditional rendering based on mode */}
-            {sidebarMode === 'event' ? (
-              <EventForm
-                event={selectedEvent}
-                onClose={handleFormClose}
-                onFormSubmit={handleFormSubmitAndSuccess}
-                onDelete={handleEventDelete}
-                disabled={isSyncing}
-              />
-            ) : (
-              <GroupScheduler />
-            )}
+            <EventForm 
+              event={selectedEvent} 
+              onClose={handleFormClose}
+              onFormSubmit={handleFormSubmitAndSuccess}
+              onDelete={handleEventDelete}
+              disabled={isSyncing}
+            />
           </div>
         )}
       </div>
@@ -560,6 +511,7 @@ const Calendar: React.FC = () => {
             onClick={() => setError(null)}
             className="ml-4 text-white opacity-80 hover:opacity-100"
           >
+            {/* Fixed SVG attributes to use React camelCase */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>

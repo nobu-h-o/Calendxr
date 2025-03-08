@@ -67,7 +67,7 @@ export default function LandingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <p className="text-sm text-green-700">
-                <span className="font-medium">Security-first:</span> We use secure PostgreSQL database and only store essential data to provide you with the best experience.
+                <span className="font-medium">Privacy-first:</span> We don't collect or store your data. Everything syncs directly with your Google account.
               </p>
             </div>
             {!session ? (
@@ -185,7 +185,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Data Security Banner */}
+      {/* Privacy First Banner */}
       <div className="bg-white py-12 px-4 sm:px-6 lg:px-8 border-y border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-block p-3 bg-blue-50 rounded-full mb-6">
@@ -193,9 +193,9 @@ export default function LandingPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">Your Data Security Is Our Priority</h2>
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">Your Privacy Is Our Priority</h2>
           <p className="text-xl text-gray-500 mb-6">
-            We use Prisma with PostgreSQL to securely store your data while maintaining strong privacy practices. Our code is open source so you can verify our security standards.
+            We don't collect or store your personal data because we don't have a database. Our code is open source so you can verify this yourself.
           </p>
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm text-left">
             <h3 className="text-lg font-medium text-gray-900 mb-4">How we protect your data:</h3>
@@ -204,31 +204,31 @@ export default function LandingPage() {
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700"><a className="font-bold">Secure PostgreSQL database</a> - with minimal data storage for your events and preferences</span>
+                <span className="text-gray-700"><a className="font-bold">No database storage</a> - everything syncs directly with your Google account</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Your calendar events are <a className="font-bold">securely managed</a> through your Google account integration</span>
+                <span className="text-gray-700">Your calendar events <a className="font-bold">never leave your account</a> except to be displayed to you</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Your uploaded images for event creation are processed and then <a className="font-bold">not retained long-term</a></span>
+                <span className="text-gray-700">Your uploaded images for event creation are processed and then <a className="font-bold">discarded</a></span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">We implement <a className="font-bold">industry-standard encryption</a> for all sensitive data</span>
+                <span className="text-gray-700">Each chat session with our AI assistant is <a className="font-bold">discarded</a> after you close it</span>
               </li>
               <li className="flex items-start">
                 <svg className="h-6 w-6 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">Our code is 100% <a className="font-bold">open source</a> - you can verify our security practices yourself</span>
+                <span className="text-gray-700">Our code is 100% <a className="font-bold">open source</a> - you can verify our privacy claims yourself</span>
               </li>
             </ul>
           </div>
@@ -316,13 +316,6 @@ export default function LandingPage() {
                   <span className="text-gray-600">from</span>
                   <span className="text-green-600">'@/lib/chatbot'</span>
                 </div>
-                <div className="flex items-center">
-                  <span className="text-green-600 mr-2">+</span>
-                  <span className="text-gray-600 mr-2">import</span> 
-                  <span className="text-blue-600">prisma</span> 
-                  <span className="text-gray-600">from</span>
-                  <span className="text-green-600">'@/lib/prisma'</span>
-                </div>
               </div>
               
               <div className="flex items-center justify-between text-sm mb-5">
@@ -331,7 +324,7 @@ export default function LandingPage() {
                     <svg className="h-4 w-4 text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
-                    <span>Stars: 8</span>
+                    <span>Stars: 6</span>
                   </div>
                   <div className="flex items-center">
                     <svg className="h-4 w-4 text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -352,8 +345,6 @@ export default function LandingPage() {
                   <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Tailwind CSS</span>
                   <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">TypeScript</span>
                   <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">NextAuth.js</span>
-                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">Prisma</span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">PostgreSQL</span>
                 </div>
               </div>
             </div>
@@ -376,7 +367,7 @@ export default function LandingPage() {
                 <span className="text-2xl font-bold text-indigo-600">1</span>
               </div>
               <h3 className="text-xl font-medium text-gray-900">Sign Up</h3>
-              <p className="mt-2 text-base text-gray-500">Connect your Google Calendar and create your Calendxr account in seconds with secure data storage.</p>
+              <p className="mt-2 text-base text-gray-500">Connect your Google Calendar and create your Calendxr account in seconds - no additional data storage required.</p>
             </div>
 
             {/* Step 2 */}
@@ -435,7 +426,7 @@ export default function LandingPage() {
               <li>Image-to-Event</li>
               <li>Group Scheduling</li>
               <li>Smart Reminders</li>
-              <li>Secure Data Storage</li>
+              <li>No Data Collection</li>
             </ul>
           </div>
           <div>
