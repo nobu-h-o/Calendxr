@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/nobu-h-o/Calendxr?style=social)](https://github.com/nobu-h-o/Calendxr/stargazers)
 [![GitHub license](https://img.shields.io/github/license/nobu-h-o/Calendxr)](https://github.com/nobu-h-o/Calendxr/blob/main/LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-13.x-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-black)](https://nextjs.org/)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
 [English](README.md) | 日本語
@@ -38,11 +38,13 @@
 - [Git](https://git-scm.com/)
 - [Poetry](https://python-poetry.org/) (Python依存関係管理用)
 - [Python](https://www.python.org/) (v3.9以上)
+- [PostgreSQL](https://www.postgresql.org/) (データベース用)
 
 また、以下も必要です：
 - Calendar APIとVision APIが有効化されたGoogle Cloudアカウント
 - 特定のAI機能用のOpenAI APIキー
 - RAGチャットボット実装用のDify AIアカウント
+- データベースアクセス用のPostgreSQL接続文字列
 
 ### インストール
 
@@ -75,9 +77,18 @@
     - OpenAI APIキー
     - Dify APIキーとエンドポイント
     - NextAuth URLとシークレット
+    - PostgreSQLデータベース接続文字列
     
    アプリケーションが正しく機能するために、両方の環境ファイルに必要なすべての変数を入力してください。
-3. 以下の開発方法のいずれかを選択します：
+
+3. データベースをセットアップします：
+   ```bash
+   cd backend
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
+
+4. 以下の開発方法のいずれかを選択します：
 
 #### Dockerの使用（推奨）
 
@@ -102,7 +113,7 @@ poetry update
 poetry run uvicorn main:app --reload
 ```
 
-4. ブラウザで[http://localhost:3000](http://localhost:3000)を開いて結果を確認します。
+5. ブラウザで[http://localhost:3000](http://localhost:3000)を開いて結果を確認します。
 
 ## ⚡ 機能
 
@@ -123,13 +134,19 @@ CalendxrはAIを活用したスマートカレンダー体験を提供し、以�
 
 - **Googleカレンダーへの直接統合：**
   - Googleカレンダーとのシームレスな同期
-  - イベントのデータベース保存なし - すべてはGoogleアカウント内に保持されます
+  - イベントはGoogleアカウントと拡張機能のための安全なデータベース両方に保存されます
+
+- **グループスケジューリング：**
+  - 複数の参加者とのグループイベントの作成と管理
+  - 参加者の予定に基づいた最適な会議時間の検索
+  - 招待状の送信と返答の追跡
+  - イベント詳細の共同編集
 
 ## 🔒 プライバシー重視のアプローチ
 
 Calendxrでは、プライバシーを重視しています：
 
-- **データベース保存なし：** ユーザー情報やカレンダーイベントのデータベースを維持しません。すべてはGoogleアカウントと直接同期されます。
+- **安全なデータベース保存：** グループスケジューリングなどの高度な機能に必要な必須データのみを安全に保存するためにPrismaとPostgreSQLを使用しています。
 
 - **一時的な処理：** イベント作成のためにアップロードされた画像は処理後すぐに破棄されます。
 
@@ -145,6 +162,8 @@ Calendxrでは、プライバシーを重視しています：
 
 - [Next.js](https://nextjs.org/) - フロントエンド構築のためのReactフレームワーク
 - [FastAPI](https://fastapi.tiangolo.com/) - バックエンドAPIフレームワーク
+- [Prisma](https://www.prisma.io/) - データベースアクセス用ORM
+- [PostgreSQL](https://www.postgresql.org/) - データ保存用のリレーショナルデータベース
 - [Docker](https://www.docker.com/) - 一貫した開発とデプロイのためのコンテナ化
 - [Vercel](https://vercel.com/) - フロントエンドホスティングプラットフォーム
 - [AWS](https://aws.amazon.com/) - バックエンドサーバーインフラストラクチャ
@@ -173,13 +192,19 @@ Calendxrは現代的なWebアプリケーションアーキテクチャに従っ
 2. **バックエンドサービス:**
    - 特定の機能のためのFastAPIマイクロサービス
    - イベント処理のためのサーバーレス機能
+   - 型安全なデータベースアクセスのためのPrisma ORM
 
-3. **統合レイヤー:**
+3. **データベースレイヤー:**
+   - 信頼性の高いデータ保存のためのPostgreSQL
+   - データベーススキーマ管理のためのPrismaマイグレーション
+   - グループスケジューリング機能のための効率的なクエリ
+
+4. **統合レイヤー:**
    - Google APIとの直接統合
    - サードパーティサービスへの安全なAPI呼び出し
 
-4. **主要設計原則:**
-   - デザインによるプライバシー - 不必要なデータ保存なし
+5. **主要設計原則:**
+   - 適切なアクセス制御による安全なデータ保存
    - すべてのデバイス向けのレスポンシブデザイン
    - アクセシビリティ準拠
 
@@ -201,21 +226,12 @@ Calendxrは現代的なWebアプリケーションアーキテクチャに従っ
 
 ## 👨‍💻 開発チーム
 
-<<<<<<< HEAD
 - **Miu Nicole Takagi** - *プロジェクトマネージャー* - [GitHub](https://github.com/mint-talltree)
 - **Nobuhiro Oto** - *フルスタック* - [GitHub](https://github.com/nobu-h-o)
 - **Ryota Tetsuka** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
 - **Jihun Park** - *バックエンド* - [GitHub](https://github.com/JihunPark03)
 - **Atomu Naka** - *バックエンド* - [GitHub](https://github.com/Cardioid22)
 - **Misaki Hara** - *バックエンド＆インフラ* - [GitHub](https://github.com/gostachan)
-=======
-- **高木美羽ニコル** - *プロジェクトマネージャー* - [GitHub](https://github.com/mint-talltree)
-- **太田信浩** - *フルスタック* - [GitHub](https://github.com/nobu-h-o)
-- **手塚瞭太** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
-- **パク・ジフン** - *バックエンド* - [GitHub](https://github.com/JihunPark03)
-- **中晃夢** - *バックエンド* - [GitHub](https://github.com/Cardioid22)
-- **原美咲** - *バックエンド＆インフラ* - [GitHub](https://github.com/gostachan)
->>>>>>> 305988b (update readme)
 
 ## 🙏 謝辞
 
