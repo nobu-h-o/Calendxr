@@ -438,9 +438,8 @@ const Calendar: React.FC = () => {
     
     return () => {
       clearTimeout(timer);
-      // Remove any added styles when component unmounts
       const styleEl = document.querySelector('style:last-child');
-      if (styleEl && styleEl.textContent.includes('.plus-icon')) {
+      if (styleEl?.textContent?.includes('.plus-icon')) {
         document.head.removeChild(styleEl);
       }
     };
