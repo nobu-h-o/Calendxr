@@ -231,7 +231,7 @@ Calendxrは現代的なWebアプリケーションアーキテクチャに従っ
 - **Ryota Tetsuka** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
 - **Jihun Park** - *バックエンド & データサイエンティスト* - [GitHub](https://github.com/JihunPark03)
 - **Atomu Naka** - *バックエンド & データサイエンティスト* - [GitHub](https://github.com/Cardioid22)
-- **Misaki Hara** - *バックエンド＆インフラエンジニア* - [GitHub](https://github.com/gostachan)
+- **Misaki Hara** - *バックエンド & インフラエンジニア* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 謝辞
 
