@@ -413,22 +413,8 @@ const Calendar: React.FC = () => {
     const updateButtonStyles = () => {
       const btn = document.querySelector('.fc-myCustomButton-button');
       if (btn) {
-        // Use a thicker plus icon with adjusted viewBox and stroke-width
-        btn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="plus-icon">
-            <line x1="12" y1="5" x2="12" y2="19" stroke-width="3"></line>
-            <line x1="5" y1="12" x2="19" y2="12" stroke-width="3"></line>
-          </svg>
-        `;
-        
-        // Add CSS to ensure the stroke appears thicker
-        const styleEl = document.createElement('style');
-        styleEl.textContent = `
-          .plus-icon line {
-            stroke-width: 3px !important;
-          }
-        `;
-        document.head.appendChild(styleEl);
+        // Modern plus icon with thinner lines - Fixed SVG attributes to use React camelCase with larger size
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
       }
     };
     
@@ -436,6 +422,7 @@ const Calendar: React.FC = () => {
     updateButtonStyles();
     const timer = setTimeout(updateButtonStyles, 100);
     
+<<<<<<< HEAD
     return () => {
       clearTimeout(timer);
       const styleEl = document.querySelector('style:last-child');
@@ -443,6 +430,9 @@ const Calendar: React.FC = () => {
         document.head.removeChild(styleEl);
       }
     };
+=======
+    return () => clearTimeout(timer);
+>>>>>>> de1d320 (Revert "ui changes")
   }, []);
 
   // New function to create a new event
