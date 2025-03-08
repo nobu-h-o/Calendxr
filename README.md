@@ -38,11 +38,13 @@ Before you begin, ensure you have the following installed:
 - [Git](https://git-scm.com/)
 - [Poetry](https://python-poetry.org/) (for Python dependency management)
 - [Python](https://www.python.org/) (v3.9 or higher)
+- [PostgreSQL](https://www.postgresql.org/) (for the database)
 
 You will also need:
 - A Google Cloud account with Calendar API and Vision API enabled
 - OpenAI API key for certain AI functionalities
 - Dify AI account for RAG chatbot implementation
+- PostgreSQL connection string for database access
 
 ### Installation
 
@@ -75,9 +77,18 @@ You will also need:
     - OpenAI API key
     - Dify API key and endpoint
     - NextAuth URL and secret
+    - PostgreSQL database connection string
     
    Make sure to populate all necessary variables in both environment files for the application to function correctly.
-3. Choose one of the following development methods:
+
+3. Set up the database:
+   ```bash
+   cd backend
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
+
+4. Choose one of the following development methods:
 
 #### Using Docker (Recommended)
 
@@ -102,7 +113,7 @@ poetry update
 poetry run uvicorn main:app --reload
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## ⚡ Features
 
@@ -123,13 +134,19 @@ Calendxr provides an AI-powered smart calendar experience with the following key
 
 - **Direct Google Calendar Integration:**
   - Seamless sync with your Google Calendar
-  - No database storage of your events - everything stays in your Google account
+  - Events stored both in your Google account and our secure database for enhanced features
+
+- **Group Scheduling:**
+  - Create and manage group events with multiple participants
+  - Find optimal meeting times based on participants' availability
+  - Send invitations and track responses
+  - Collaborative editing of event details
 
 ## 🔒 Privacy First Approach
 
 At Calendxr, we take your privacy seriously:
 
-- **No Database Storage:** We don't maintain a database of user information or calendar events. Everything syncs directly with your Google account.
+- **Secure Database Storage:** We use Prisma with PostgreSQL to securely store only the essential data needed for advanced features like group scheduling.
 
 - **Ephemeral Processing:** Your uploaded images for event creation are processed and then immediately discarded.
 
@@ -145,6 +162,8 @@ At Calendxr, we take your privacy seriously:
 
 - [Next.js](https://nextjs.org/) - The React Framework for building the frontend
 - [FastAPI](https://fastapi.tiangolo.com/) - Backend API framework
+- [Prisma](https://www.prisma.io/) - ORM for database access
+- [PostgreSQL](https://www.postgresql.org/) - Relational database for data storage
 - [Docker](https://www.docker.com/) - Containerization for consistent development and deployment
 - [Vercel](https://vercel.com/) - Frontend hosting platform
 - [AWS](https://aws.amazon.com/) - Backend server infrastructure
@@ -173,13 +192,19 @@ Calendxr follows a modern web application architecture:
 2. **Backend Services:**
    - FastAPI microservices for specific functionality
    - Serverless functions for event processing
+   - Prisma ORM for type-safe database access
 
-3. **Integration Layer:**
+3. **Database Layer:**
+   - PostgreSQL for reliable data storage
+   - Prisma migrations for database schema management
+   - Efficient querying for group scheduling features
+
+4. **Integration Layer:**
    - Direct integration with Google APIs
    - Secure API calls to third-party services
 
-4. **Key Design Principles:**
-   - Privacy by design - no unnecessary data storage
+5. **Key Design Principles:**
+   - Secure data storage with proper access controls
    - Responsive design for all devices
    - Accessibility compliance
 
