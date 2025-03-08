@@ -7,6 +7,8 @@ import { Input } from "@/app/components/ui/input"
 import { ScrollArea } from "@/app/components/ui/scroll-area"
 import { useState, useEffect, useRef } from "react"
 import { UIMessage } from "ai"
+import { useSession } from "next-auth/react";
+
 
 export function ChatInterface() {
   const [message, setMessage] = useState("")
@@ -14,6 +16,50 @@ export function ChatInterface() {
   const [loading, setLoading] = useState(false)
   const [conversationID, setConversationID] = useState("")
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const { data: session } = useSession();
+
+
+  useEffect(() => {
+    if (session?.user) {
+      const { email, name } = session.user;
+      if (!email) {
+        console.error("Email not found.");
+        return;
+      }
+
+      (async () => {
+        try {
+          const res = await fetch(`/api/calendar/get`);
+          const calendarData = await res.json();
+          
+          const filteredData = calendarData.map(({ id, title, start, end }: { id: string; title: string; start: string; end: string }) => ({
+            id,
+            title,
+            start : new Date(start),
+            end: new Date(end),
+          }));
+          console.log("Data loaded");
+
+          const saveRes = await fetch(`/api/user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, events: filteredData }),
+          });
+
+          console.log("Data loaded successfully");
+          if (!saveRes.ok) {
+            throw new Error("Failed to save user and events.");
+          }
+
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      })();
+    }
+    else {
+      console.error("Session not found.");
+    }
+  }, [session]);
 
   // Auto-scroll when messages update
   useEffect(() => {
@@ -91,7 +137,6 @@ export function ChatInterface() {
               <ul className="mt-2 space-y-1 text-sm">
                 <li>"What meetings do I have today?"</li>
                 <li>"When is my next client call?"</li>
-                <li>"Schedule a team meeting for tomorrow at 2pm"</li>
               </ul>
             </div>
           ) : (
