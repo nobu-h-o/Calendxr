@@ -55,16 +55,16 @@
    ```
 
 2. 環境変数を設定します：
-
+   
    フロントエンドとバックエンドのディレクトリには、それぞれ独自の環境設定があります：
-
+    
    #### フロントエンド環境
    環境ファイルの例をコピーして、値を更新します：
    ```bash
    cd frontend
    cp .env.example .env.local
    ```
-
+    
    #### バックエンド環境
    環境ファイルの例をコピーして、値を更新します：
    ```bash
@@ -78,7 +78,7 @@
     - Dify APIキーとエンドポイント
     - NextAuth URLとシークレット
     - PostgreSQLデータベース接続文字列
-
+    
    アプリケーションが正しく機能するために、両方の環境ファイルに必要なすべての変数を入力してください。
 
 3. データベースをセットアップします：
@@ -128,7 +128,7 @@ CalendxrはAIを活用したスマートカレンダー体験を提供し、以�
   - カレンダーの整理に関するインテリジェントな提案
   - Difyの検索拡張生成（RAG）技術を活用
 
-- **自動イベント提案：**
+- **自動イベント提案：** 
   - AIが利用可能な日付から潜在的なイベントを検出
   - あなたのパターンに基づいたスケジュール設定のためのスマートな推奨
 
@@ -229,9 +229,9 @@ Calendxrは現代的なWebアプリケーションアーキテクチャに従っ
 - **Miu Nicole Takagi** - *プロジェクトマネージャー* - [GitHub](https://github.com/mint-talltree)
 - **Nobuhiro Oto** - *フルスタック* - [GitHub](https://github.com/nobu-h-o)
 - **Ryota Tetsuka** - *フロントエンド* - [GitHub](https://github.com/rogue1starwars)
-- **Jihun Park** - *バックエンド & データサイエンティスト* - [GitHub](https://github.com/JihunPark03)
-- **Atomu Naka** - *バックエンド & データサイエンティスト* - [GitHub](https://github.com/Cardioid22)
-- **Misaki Hara** - *バックエンド & インフラエンジニア* - [GitHub](https://github.com/gostachan)
+- **Jihun Park** - *バックエンド* - [GitHub](https://github.com/JihunPark03)
+- **Atomu Naka** - *バックエンド* - [GitHub](https://github.com/Cardioid22)
+- **Misaki Hara** - *バックエンド＆インフラ* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 謝辞
 
