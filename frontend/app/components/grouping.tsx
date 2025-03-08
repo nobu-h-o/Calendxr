@@ -292,7 +292,7 @@ const GroupScheduler = () => {
           </div>
         ))}
         <Button onClick={handleAddMember} className="mb-4">
-          ➕ Add Member
+          Add Member
         </Button>
         
         <div className="mb-4">
@@ -314,7 +314,7 @@ const GroupScheduler = () => {
           className="w-full mb-4"
           disabled={loading}
         >
-          {loading ? "Finding times..." : "📅 Find Best Meeting Time"}
+          {loading ? "Finding times..." : "Find Best Meeting Time"}
         </Button>
         
         {hasResults && (
