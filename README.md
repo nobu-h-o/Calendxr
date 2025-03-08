@@ -55,16 +55,16 @@ You will also need:
    ```
 
 2. Set up environment variables:
-   
+
    Both the frontend and backend directories have their own environment configurations:
-    
+
    #### Frontend Environment
    Copy the example environment file and update it with your values:
    ```bash
    cd frontend
    cp .env.example .env.local
    ```
-    
+
    #### Backend Environment
    Copy the example environment file and update it with your values:
    ```bash
@@ -78,7 +78,7 @@ You will also need:
     - Dify API key and endpoint
     - NextAuth URL and secret
     - PostgreSQL database connection string
-    
+
    Make sure to populate all necessary variables in both environment files for the application to function correctly.
 
 3. Set up the database:
@@ -128,7 +128,7 @@ Calendxr provides an AI-powered smart calendar experience with the following key
   - Get intelligent suggestions for organizing your calendar
   - Powered by Dify's Retrieval-Augmented Generation technology
 
-- **Automated Event Suggestions:** 
+- **Automated Event Suggestions:**
   - AI detects potential events from available dates
   - Smart recommendations for scheduling based on your patterns
 
@@ -229,9 +229,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Miu Nicole Takagi** - *Project Manager* - [GitHub](https://github.com/mint-talltree)
 - **Nobuhiro Oto** - *Fullstack* - [GitHub](https://github.com/nobu-h-o)
 - **Ryota Tetsuka** - *Frontend* - [GitHub](https://github.com/rogue1starwars)
-- **Jihun Park** - *Backend* - [GitHub](https://github.com/JihunPark03)
-- **Atomu Naka** - *Backend* - [GitHub](https://github.com/Cardioid22)
-- **Misaki Hara** - *Backend & Infra* - [GitHub](https://github.com/gostachan)
+- **Jihun Park** - *Backend & Data Scientist* - [GitHub](https://github.com/JihunPark03)
+- **Atomu Naka** - *Backend & Data Scientist* - [GitHub](https://github.com/Cardioid22)
+- **Misaki Hara** - *Backend & Infrastructure Engineer* - [GitHub](https://github.com/gostachan)
 
 ## 🙏 Acknowledgments
 
