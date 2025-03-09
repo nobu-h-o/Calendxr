@@ -39,7 +39,8 @@ export async function GET() {
       start: item.start?.dateTime || item.start?.date || new Date().toISOString(),
       end: item.end?.dateTime || item.end?.date || new Date().toISOString(),
     }));
-    console.log("Fetched Events:", events);
+    // Turn on only while developping
+    // console.log("Fetched Events:", events);
     return NextResponse.json(events);
 
   } catch (error: any) {

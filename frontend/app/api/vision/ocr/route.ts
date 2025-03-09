@@ -30,7 +30,8 @@ export async function sendOcrImage(image: File) {
     
     // Get the raw response
     const rawText = await response.text();
-    console.log("Raw OCR API response:", rawText);
+    //Turn on only for developping
+    //console.log("Raw OCR API response:", rawText);
     
     // Try to parse as JSON
     try {
