@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET() {
   const backendOcrUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/ocr";
   try {
     // Create a FormData object and append a dummy file for testing
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     }
     const data = await response.json();
     return NextResponse.json({ message: "Backend OCR endpoint called successfully", data });
-  } catch (error: any) {
-    return NextResponse.json({ error: "Failed to connect to backend OCR endpoint", details: error.message });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to connect to backend OCR endpoint", details: error });
   }
 }

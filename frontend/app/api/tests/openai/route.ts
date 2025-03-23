@@ -38,11 +38,11 @@ export async function GET() {
       environment: envDetails,
       openaiApiTest,
     });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({
       status: "error",
       message: "Failed to connect to OpenAI API",
-      details: error.message,
+      details: error,
     }, { status: 500 });
   }
 }
