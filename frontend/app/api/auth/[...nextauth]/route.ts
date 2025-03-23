@@ -1,7 +1,9 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import type { JWT } from "next-auth/jwt";
+import type { Account } from "next-auth";
 import type { Session } from "next-auth";
+
 declare module "next-auth" {
   interface Session {
     accessToken?: string;
@@ -32,14 +34,20 @@ export const authOptions = {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async jwt({ token, account }: { token: JWT; account?: any }): Promise<JWT> {
+    async jwt({ token, account }: { 
+      token: JWT; 
+      account?: Account | null; 
+    }) {
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token ?? token.refreshToken;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+    async session({ session, token }: { 
+      session: Session; 
+      token: JWT;
+    }) {
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       return session;
@@ -49,4 +57,4 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST, handler as PUT};
+export { handler as GET, handler as POST, handler as PUT };
