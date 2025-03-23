@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-
-// @ts-ignore: Module 'googleapis' might need to be installed with its types.
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 
@@ -24,10 +22,8 @@ export async function POST(request: Request) {
     }
     
     // 3. Parse request body
-    let body;
-    try {
-      body = await request.json();
-    } catch (error) {
+    const body = await request.json();
+    if(!body) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
     

@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-
- // @ts-ignore: Module 'googleapis' might need to be installed with its types.
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  const accessToken = (session as any)?.accessToken; // Cast session as any to access accessToken
+  const accessToken = (session)?.accessToken; // Cast session as any to access accessToken
 
   if (!session || !session.user || !accessToken) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -32,7 +30,7 @@ export async function GET() {
       orderBy: "startTime",
     });
     
-    const events = ((res.data.items as any[]) || []).map((item: any) => ({
+    const events = ((res.data.items) || []).map((item) => ({
       id: item.id,
       title: item.summary || "No Title",
       description: item.description || "",
@@ -43,8 +41,8 @@ export async function GET() {
     // console.log("Fetched Events:", events);
     return NextResponse.json(events);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Calendar API error:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch calendar events" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch calendar events" }, { status: 500 });
   }
 }
