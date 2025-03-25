@@ -2,13 +2,9 @@ name: Next.js CI/CD
 
 on:
   push:
-    branches: [ main, master, development ]
-    paths:
-      - 'frontend/**'
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-    paths:
-      - 'frontend/**'
+    branches: [ main ]
 
 jobs:
   build:
