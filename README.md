@@ -13,7 +13,6 @@ English | [日本語](README.jp.md)
 - [🚀 Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-  - [Environment Setup](#environment-setup)
 - [⚡ Features](#-features)
 - [🔒 Privacy First Approach](#-privacy-first-approach)
 - [🛠 Built With](#-built-with)
@@ -209,7 +208,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Special thanks to our hackathon team for their dedication and creativity
-- Huge appreciation to the hackathon organizers, judges, and fellow participants
-- Thanks to the open source community for the amazing tools and libraries used in this project
-- Google Cloud for providing the APIs that power our key features
-- Dify AI for their support with the RAG chatbot implementation
+- Huge appreciation to the [EGH](https://event.gaishishukatsu.com/hackathon/2025_march) organizers, judges, and fellow participants
