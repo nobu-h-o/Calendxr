@@ -193,8 +193,6 @@ We welcome contributions from the community! To contribute:
 4. Push to the branch: `git push origin feature/AmazingFeature`
 5. Open a Pull Request
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
