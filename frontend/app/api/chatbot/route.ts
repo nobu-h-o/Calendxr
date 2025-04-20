@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare the payload for OpenAI
     const payload = {
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-nano",
       messages: messages,
     };
 
