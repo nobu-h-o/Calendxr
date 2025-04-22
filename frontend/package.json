@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
-    "@fullcalendar/bootstrap5": "^6.1.15",
+    "@fullcalendar/bootstrap5": "^6.1.17",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.17",
