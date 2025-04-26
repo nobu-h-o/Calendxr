@@ -1,4 +1,68 @@
-export async function getCalendarEvents() {
+interface CalendarEvent {
+  id: string;
+  summary: string;
+  description?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  location?: string;
+  attendees?: Array<{
+    email: string;
+    displayName?: string;
+    responseStatus?: 'needsAction' | 'declined' | 'tentative' | 'accepted';
+  }>;
+  status?: 'confirmed' | 'tentative' | 'cancelled';
+  colorId?: string;
+  visibility?: 'default' | 'public' | 'private';
+  reminders?: {
+    useDefault: boolean;
+    overrides?: Array<{
+      method: 'email' | 'popup';
+      minutes: number;
+    }>;
+  };
+}
+
+// Type for the update operations
+interface EventUpdateData {
+  summary?: string;
+  description?: string;
+  start?: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  end?: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  location?: string;
+  colorId?: string;
+  status?: 'confirmed' | 'tentative' | 'cancelled';
+  visibility?: 'default' | 'public' | 'private';
+  attendees?: Array<{
+    email: string;
+    displayName?: string;
+    responseStatus?: 'needsAction' | 'declined' | 'tentative' | 'accepted';
+  }>;
+  reminders?: {
+    useDefault: boolean;
+    overrides?: Array<{
+      method: 'email' | 'popup';
+      minutes: number;
+    }>;
+  };
+}
+
+export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   const response = await fetch("/api/calendar/get");
   if (!response.ok) {
     throw new Error("Failed to fetch calendar events");
@@ -6,7 +70,11 @@ export async function getCalendarEvents() {
   return response.json();
 }
 
-export async function updateCalendarEvent(calendarId: string, eventId: string, updateData: any) {
+export async function updateCalendarEvent(
+  calendarId: string, 
+  eventId: string, 
+  updateData: EventUpdateData
+) {
   const response = await fetch("/api/calendar/update", {
     method: "PUT",
     headers: {
@@ -24,7 +92,10 @@ export async function updateCalendarEvent(calendarId: string, eventId: string, u
   return response.json();
 }
 
-export async function createCalendarEvent(calendarId: string, eventData: any) {
+export async function createCalendarEvent(
+  calendarId: string, 
+  eventData: CalendarEvent
+) {
   const response = await fetch("/api/calendar/create", {
     method: "POST",
     headers: {
