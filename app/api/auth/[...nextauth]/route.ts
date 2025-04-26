@@ -33,7 +33,7 @@ export const authOptions = {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async jwt({ token, account }: { token: JWT; account?: Account }): Promise<JWT> {
+    async jwt({ token, account }: { token: JWT; account: Account | null }): Promise<JWT> {
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token ?? token.refreshToken;
