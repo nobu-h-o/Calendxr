@@ -1,4 +1,4 @@
-name: Next.js CI/CD
+name: Next.js CI
 
 on:
   push:
