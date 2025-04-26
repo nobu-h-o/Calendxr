@@ -60,14 +60,6 @@ const Calendar: React.FC = () => {
     }
   };
 
-  const handleDialogChange = (open: boolean) => {
-    setIsFormOpen(open);
-    if (!open && !isSyncing) {
-      clearSelection();
-      setSelectedEvent(null);
-    }
-  };
-
   const handleEventClick = async (clickInfo: any) => {
     await fetchEvents();
     const event = clickInfo.event;
@@ -111,8 +103,8 @@ const Calendar: React.FC = () => {
   const handleDateSelect = (selectInfo: any) => {
     setActiveSelection(selectInfo);
     
-    let startDate = selectInfo.start;
-    let endDate = selectInfo.end;
+    const startDate = selectInfo.start;
+    const endDate = selectInfo.end;
     const allDay = selectInfo.allDay;
     const view = selectInfo.view.type;
     
@@ -195,14 +187,12 @@ const Calendar: React.FC = () => {
   const handleEventChange = async (changeInfo: any) => {
     try {
       setIsSyncing(true);
-      const { event, oldEvent } = changeInfo;
+      const { event } = changeInfo;
       
       const calendarId = event.extendedProps?.calendarId || 'primary'; 
       const eventId = event.id;
       
-      const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
-      let updateData: any = {
+      const updateData: any = {
         summary: event.title
       };
       

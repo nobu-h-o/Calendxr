@@ -93,13 +93,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
     if (!file) return;
     
     try {
-      // Check if this is an HEIC/HEIF file
-      const isHeic = file.type === 'image/heic' || 
-                    file.type === 'image/heif' || 
-                    file.name.toLowerCase().endsWith('.heic') ||
-                    file.name.toLowerCase().endsWith('.heif');
-      
-      let imageFile = file;
+      const imageFile = file;
       
       // If it's an HEIC file and we're in a browser that doesn't support it natively,
       // we would need to convert it. However, since we're just passing the file to an
@@ -212,7 +206,7 @@ const OCRPanel: React.FC<OCRPanelProps> = ({
                   // First try parsing as is
                   new Date(dateStr).toISOString();
                   return dateStr;
-                } catch (e) {
+                } catch {
                   // If basic format (YYYY-MM-DD) without time, add default time and timezone
                   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
                     const now = new Date();
