@@ -79,7 +79,7 @@ export async function sendOcrImage(image: File) {
 
   try {
     // Get the base URL from environment variable or use a default
-    const baseUrl = process.env.VERCEL_URL || 'http://localhost:3000';
+    const baseUrl = process.env.PROJECT_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/vision/ocr`, {
       method: 'POST',
       body: formData,
