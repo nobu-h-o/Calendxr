@@ -33,15 +33,11 @@ These instructions will help you set up the project on your local machine for de
 Before you begin, ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (v18.x or higher)
 - [npm](https://www.npmjs.com/) (v9.x or higher)
-- [Docker](https://www.docker.com/) (optional, for containerized development)
 - [Git](https://git-scm.com/)
-- [Poetry](https://python-poetry.org/) (for Python dependency management)
-- [Python](https://www.python.org/) (v3.9 or higher)
 
 You will also need:
 - A Google Cloud account with Calendar API and Vision API enabled
 - OpenAI API key for certain AI functionalities
-- Dify AI account for RAG chatbot implementation
 
 ### Installation
 
@@ -53,52 +49,24 @@ You will also need:
 
 2. Set up environment variables:
    
-   Both the frontend and backend directories have their own environment configurations:
-    
-   #### Frontend Environment
    Copy the example environment file and update it with your values:
    ```bash
-   cd frontend
-   cp .env.example .env.local
+   cp .env.example
    ```
-    
-   #### Backend Environment
-   Copy the example environment file and update it with your values:
-   ```bash
-   cd backend
-   cp .env.example .env
-   ```
+   
    Required API keys and credentials:
     - Google OAuth credentials (Client ID and Secret)
     - Google Cloud Vision API key
     - OpenAI API key
-    - Dify API key and endpoint
     - NextAuth URL and secret
     
-   Make sure to populate all necessary variables in both environment files for the application to function correctly.
-3. Choose one of the following development methods:
+   Make sure to populate all necessary variables in the environment file for the application to function correctly.
 
-#### Using Docker (Recommended)
+3. Install dependencies and start the development server:
 
-Run the entire application stack using Docker:
 ```bash
-docker compose up --build
-```
-
-#### Running Frontend and Backend Separately
-
-**For the frontend:**
-```bash
-cd frontend
 npm install
 npm run dev
-```
-
-**For the backend:**
-```bash
-cd backend
-poetry update
-poetry run uvicorn main:app --reload
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -111,10 +79,10 @@ Calendxr provides an AI-powered smart calendar experience with the following key
   - Take a photo of an event flyer or invitation
   - AI automatically extracts event details like date, time, location
 
-- **RAG-powered AI Chatbot Assistant:**
+- **AI Chatbot Assistant:**
   - Ask questions about your schedule in natural language
   - Get intelligent suggestions for organizing your calendar
-  - Powered by Dify's Retrieval-Augmented Generation technology
+  - Powered by advanced language model technology
 
 - **Automated Event Suggestions:** 
   - AI detects potential events from available dates
@@ -142,42 +110,33 @@ At Calendxr, we take your privacy seriously:
 
 ### Tech Stack
 
-- [Next.js](https://nextjs.org/) - The React Framework for building the frontend
-- [FastAPI](https://fastapi.tiangolo.com/) - Backend API framework
-- [Docker](https://www.docker.com/) - Containerization for consistent development and deployment
-- [Vercel](https://vercel.com/) - Frontend hosting platform
-- [AWS](https://aws.amazon.com/) - Backend server infrastructure
+- [Next.js](https://nextjs.org/) - React framework for building the full-stack application
+- [Vercel](https://vercel.com/) - Hosting platform
 - [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
 - [NextAuth.js](https://next-auth.js.org/) - Authentication for Next.js
-- [React Query](https://react-query.tanstack.com/) - Data fetching and state management
-- [Poetry](https://python-poetry.org/) - Python dependency management for the backend
 
 ### APIs Used
 
 - [Google Calendar API](https://developers.google.com/calendar) - For calendar integration and event management
 - [Google Cloud Vision API](https://cloud.google.com/vision) - For image analysis and text extraction
 - [OpenAI API](https://openai.com/api/) - For advanced AI processing and natural language understanding
-- [Dify AI API](https://dify.ai/) - For AI chatbot integration and RAG implementation
 
 ## 🧠 Architecture
 
-Calendxr follows a modern web application architecture:
+Calendxr follows a modern full-stack Next.js application architecture:
 
-1. **Frontend (Next.js):**
+1. **Next.js Application:**
    - Server-side rendering for improved SEO and performance
    - Client-side React components for interactive UI elements
+   - API routes for serverless backend functionality
    - NextAuth.js for authentication with Google OAuth
 
-2. **Backend Services:**
-   - FastAPI microservices for specific functionality
-   - Serverless functions for event processing
-
-3. **Integration Layer:**
+2. **Integration Layer:**
    - Direct integration with Google APIs
    - Secure API calls to third-party services
 
-4. **Key Design Principles:**
+3. **Key Design Principles:**
    - Privacy by design - no unnecessary data storage
    - Responsive design for all devices
    - Accessibility compliance
@@ -208,4 +167,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Special thanks to our hackathon team for their dedication and creativity
-- Huge appreciation to the [EGH](https://event.gaishishukatsu.com/hackathon/2025_march) organizers, judges, and fellow participants
+- Huge appreciation to the [EGH](https://event.gaishishukatsu.com/hackathon/2025_march) organizers, judges, and fellow participants, as this project was originated there
