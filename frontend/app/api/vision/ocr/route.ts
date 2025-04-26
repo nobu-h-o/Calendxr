@@ -1,21 +1,87 @@
 "use server";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleAuth } from 'google-auth-library';
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 
-/**
- * Send an OCR request with an image
- * @param image The image file to process
- * @returns The OCR response with extracted text or an error
- */
+// Initialize Google Cloud Vision client
+const auth = new GoogleAuth({
+  credentials: {
+    type: process.env.TYPE,
+    project_id: process.env.PROJECT_ID,
+    private_key_id: process.env.PRIVATE_KEY_ID,
+    private_key: process.env.PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+  },
+});
+
+async function getVisionClient() {
+  try {
+    const credentials = await auth.getCredentials();
+    if (!credentials) {
+      throw new Error('Failed to get Google Cloud credentials');
+    }
+    return new ImageAnnotatorClient({
+      credentials,
+      apiEndpoint: 'vision.googleapis.com',
+    });
+  } catch (error) {
+    console.error('Error initializing Vision client:', error);
+    throw new Error('Failed to initialize Google Cloud Vision client');
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Get the form data
+    const formData = await request.formData();
+    const image = formData.get('image') as File;
+
+    if (!image) {
+      return NextResponse.json(
+        { error: 'No image file provided' },
+        { status: 400 }
+      );
+    }
+
+    // Convert the image to a buffer
+    const buffer = Buffer.from(await image.arrayBuffer());
+
+    // Process the image with Google Cloud Vision
+    const client = await getVisionClient();
+    const [result] = await client.textDetection({
+      image: { content: buffer },
+    });
+
+    const texts = result.textAnnotations;
+    const resultText = texts?.[0]?.description || 'No text found';
+
+    return NextResponse.json({ text: resultText });
+  } catch (error) {
+    console.error('OCR processing error:', error);
+    return NextResponse.json(
+      { error: 'Failed to process image', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}
+
+// Health check endpoint
+export async function GET() {
+  return NextResponse.json;
+}
+
+// Export the sendOcrImage function for backward compatibility
 export async function sendOcrImage(image: File) {
   const formData = new FormData();
-  formData.append("image", image);
+  formData.append('image', image);
 
   try {
-    console.log(`Sending OCR request to ${API_URL}/ocr`);
-    
-    const response = await fetch(`${API_URL}/ocr`, {
-      method: "POST",
+    // Get the base URL from environment variable or use a default
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/vision/ocr`, {
+      method: 'POST',
       body: formData,
     });
 
@@ -27,29 +93,13 @@ export async function sendOcrImage(image: File) {
         details: errorText 
       };
     }
-    
-    // Get the raw response
-    const rawText = await response.text();
-    //Turn on only for developping
-    //console.log("Raw OCR API response:", rawText);
-    
-    // Try to parse as JSON
-    try {
-      const data = JSON.parse(rawText);
-      return data;
-    } catch (parseError) {
-      console.error("Failed to parse OCR API response as JSON:", parseError);
-      // Return a structured error that includes the raw text for debugging
-      return { 
-        error: "Invalid JSON response from OCR service",
-        rawResponse: rawText.substring(0, 200) // First 200 chars for debugging
-      };
-    }
+
+    return await response.json();
   } catch (error) {
-    console.error("Network error sending OCR image:", error);
+    console.error('Network error sending OCR image:', error);
     return { 
-      error: "Failed to connect to OCR service",
-      details: error!
+      error: 'Failed to connect to OCR service',
+      details: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
