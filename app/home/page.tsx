@@ -67,7 +67,7 @@ export default function LandingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <p className="text-sm text-green-700">
-                <span className="font-medium">Privacy-first:</span> We don't collect or store your data. Everything syncs directly with your Google account.
+                <span className="font-medium">Privacy-first:</span> We don&apos;t collect or store your data. Everything syncs directly with your Google account.
               </p>
             </div>
             {!session ? (
@@ -122,7 +122,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900">Intelligent Calendar Assistant</h3>
               <p className="mt-4 text-lg text-gray-500 text-center">
-                Powered by Dify's RAG technology, our intelligent chatbot understands your scheduling needs and answers all your calendar-related questions.
+                Powered by Dify&apos;s RAG technology, our intelligent chatbot understands your scheduling needs and answers all your calendar-related questions.
               </p>
               <ul className="mt-6 space-y-3">
                 <li className="flex items-start">
@@ -195,7 +195,7 @@ export default function LandingPage() {
           </div>
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">Your Privacy Is Our Priority</h2>
           <p className="text-xl text-gray-500 mb-6">
-            We don't collect or store your personal data because we don't have a database. Our code is open source so you can verify this yourself.
+            We don&apos;t collect or store your personal data because we don&apos;t have a database. Our code is open source so you can verify this yourself.
           </p>
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm text-left">
             <h3 className="text-lg font-medium text-gray-900 mb-4">How we protect your data:</h3>
@@ -245,9 +245,9 @@ export default function LandingPage() {
                   <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">We're Fully Open Source</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">We&apos;re Fully Open Source</h2>
               <p className="text-lg text-gray-600 mb-8">
-                Calendxr's code is completely open source and available on GitHub. We believe in transparency and community-driven development. Check out our repository to see exactly how we handle your data and process information.
+                Calendxr&apos;s code is completely open source and available on GitHub. We believe in transparency and community-driven development. Check out our repository to see exactly how we handle your data and process information.
               </p>
               
               <div className="space-y-4">
@@ -307,14 +307,14 @@ export default function LandingPage() {
                   <span className="text-gray-600 mr-2">import</span> 
                   <span className="text-blue-600">GoogleCloudVision</span> 
                   <span className="text-gray-600">from</span> 
-                  <span className="text-green-600">'@/lib/vision'</span>
+                  <span className="text-green-600">&apos;@/lib/vision&apos;</span>
                 </div>
                 <div className="flex items-center">
                   <span className="text-green-600 mr-2">+</span>
                   <span className="text-gray-600 mr-2">import</span> 
                   <span className="text-blue-600">DifyRAG</span> 
                   <span className="text-gray-600">from</span>
-                  <span className="text-green-600">'@/lib/chatbot'</span>
+                  <span className="text-green-600">&apos;@/lib/chatbot&apos;</span>
                 </div>
               </div>
               
@@ -395,7 +395,7 @@ export default function LandingPage() {
       <div className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-blue-500">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready to transform your scheduling experience?</h2>
-          <p className="mt-4 text-xl text-indigo-100">Join thousands of users who've simplified their calendar management with Calendxr.</p>
+          <p className="mt-4 text-xl text-indigo-100">Join thousands of users who&apos;ve simplified their calendar management with Calendxr.</p>
           {!session ? (
             <Link href="/auth/signin">
               <button className="mt-8 px-8 py-3 bg-white text-indigo-600 rounded-lg font-semibold text-lg shadow-lg hover:bg-gray-100 transition duration-300">

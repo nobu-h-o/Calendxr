@@ -89,9 +89,9 @@ export function ChatInterface() {
               <p>Ask me anything about your calendar!</p>
               <p className="text-sm mt-2">For example:</p>
               <ul className="mt-2 space-y-1 text-sm">
-                <li>"What meetings do I have today?"</li>
-                <li>"When is my next client call?"</li>
-                <li>"Schedule a team meeting for tomorrow at 2pm"</li>
+                <li>&quot;What meetings do I have today?&quot;</li>
+                <li>&quot;When is my next client call?&quot;</li>
+                <li>&quot;Schedule a team meeting for tomorrow at 2pm&quot;</li>
               </ul>
             </div>
           ) : (
