@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       const events = await calendarRes.json();
       if (Array.isArray(events)) {
         eventsText = events
-          .map((event: any) => 
+          .map((event) => 
             `Title: ${event.title}, Start: ${new Date(event.start).toLocaleString()}, End: ${new Date(event.end).toLocaleString()}`
           )
           .join("\n");
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
       answer: openaiData.choices[0].message.content || "No response",
       conversation_id: convId,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in chatbot route:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json("Internal server error" , { status: 500 });
   }
 }
